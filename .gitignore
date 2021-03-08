@@ -1,0 +1,4 @@
+.vscode
+build
+cysimdjson/cysimdjson.cpp
+cysimdjson.*.so
