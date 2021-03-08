@@ -1,7 +1,7 @@
 # cysimdjson
 
 Fast JSON parsing library for Python, 7-12 times faster than standard Python JSON parser.  
-Python bindings for the [simdjson](https://simdjson.org) using [Cython](https://cython.org).
+It is Python bindings for the [simdjson](https://simdjson.org) using [Cython](https://cython.org).
 
 Standard [Python JSON parser](https://docs.python.org/3/library/json.html) (`json.load()` etc.) is relatively slow,
 and if you need to parse large JSON files or a large number of small JSON files,
