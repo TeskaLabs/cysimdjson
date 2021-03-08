@@ -7,7 +7,7 @@ Standard [Python JSON parser](https://docs.python.org/3/library/json.html) (`jso
 and if you need to parse large JSON files or a large number of small JSON files,
 it may represent a significant bottleneck.
 
-Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://github.com/TkTech/pysimdjson), [libpy_simdjson](https://github.com/gerrymanoim/libpy_simdjson) or [orjson](https://github.com/ijl/orjson), they don't reach the raw speed that is provided by the brilliant [SIMDJSON](https://simdjson.org) project. SIMDJSON is C++ JSON parser based on SIMD instructions, reportedly the fastest JSON parser on the planet.
+Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://github.com/TkTech/pysimdjson), [libpy_simdjson](https://github.com/gerrymanoim/libpy_simdjson) or [orjson](https://github.com/ijl/orjson), they don't reach the raw speed that is provided by the brilliant [SIMDJSON](https://simdjson.org) project. SIMDJSON is C++ JSON parser based on [SIMD instructions](https://en.wikipedia.org/wiki/SIMD), reportedly the fastest JSON parser on the planet.
 
 
 ## Usage
