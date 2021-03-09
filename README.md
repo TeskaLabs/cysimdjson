@@ -16,7 +16,7 @@ Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://gi
 
 ## Usage
 
-```
+```python
 import cysimdjson
 
 json_bytes = b'''
