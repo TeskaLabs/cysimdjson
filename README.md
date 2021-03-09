@@ -46,6 +46,8 @@ _Note: cysimdjson will be released to pypi shortly._
 * orjson loads              110615.70 EPS (  4.61)   265.15 MB/s
 * python json loads          72096.80 EPS (  7.08)   172.82 MB/s
 ----------------------------------------------------------------
+
+SIMDJSON: 543335.93 EPS, 1241.52 MB/s
 ```
 
 ```
@@ -58,6 +60,8 @@ _Note: cysimdjson will be released to pypi shortly._
 * orjson loads                 387.11 EPS (  6.60)   244.47 MB/s
 * python json loads            278.63 EPS (  9.17)   175.96 MB/s
 ----------------------------------------------------------------
+
+SIMDJSON: 2536.16 EPS,  1527.28 MB/s
 ```
 
 ```
@@ -70,6 +74,8 @@ _Note: cysimdjson will be released to pypi shortly._
 * orjson loads                  81.80 EPS (  3.48)   184.13 MB/s
 * python json loads             22.52 EPS ( 12.64)    50.68 MB/s
 ----------------------------------------------------------------
+
+SIMDJSON: 307.95 EPS, 661.08 MB/s
 ```
 
 ```
@@ -82,6 +88,8 @@ _Note: cysimdjson will be released to pypi shortly._
 * orjson loads                 166.67 EPS (  4.65)   554.66 MB/s
 * python json loads            113.72 EPS (  6.82)   378.43 MB/s
 ----------------------------------------------------------------
+
+SIMDJSON: 703.59 EPS, 2232.92 MB/s
 ```
 
 ```
@@ -94,6 +102,8 @@ _Note: cysimdjson will be released to pypi shortly._
 * pysimdjson parse          977530.90 EPS (  4.06)     6.84 MB/s
 * python json loads         527932.65 EPS (  7.52)     3.70 MB/s
 ----------------------------------------------------------------
+
+SIMDJSON: 3799392.10 EPS
 ```
 
 CPU: AMD EPYC 7452
