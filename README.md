@@ -19,8 +19,20 @@ Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://gi
 ```
 import cysimdjson
 
+json_bytes = b'''
+{
+  "foo": [1,2,[3]]
+}
+'''
+
 parser = cysimdjson.JSONParser()
 json_parsed = parser.parse(json_bytes)
+
+# Standard Python access
+print(json_parsed['foo'][2][0])
+
+# Access using JSON Pointer (faster)
+print(json_parsed.at_pointer("/foo/2/0"))
 ```
 
 _Note: `parser` object can be reused for maximum performance._
