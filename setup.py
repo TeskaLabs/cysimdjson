@@ -39,7 +39,7 @@ setup(
 		"cysimdjson",
 	],
 	project_urls={
-		"https://github.com/TeskaLabs/cysimdjson",
+		"Source": "https://github.com/TeskaLabs/cysimdjson",
 	},
 	install_requires=[
 	],
