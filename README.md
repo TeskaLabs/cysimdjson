@@ -124,6 +124,11 @@ SIMDJSON: 3799392.10 EPS
 
 CPU: AMD EPYC 7452
 
+More performance testing:
+
+ * [Apple M1](https://github.com/TeskaLabs/cysimdjson/wiki/Performance-on-Apple-M1): > 1M EPS, > 3GB/s
+
+
 
 ### Tests are reproducible
 
