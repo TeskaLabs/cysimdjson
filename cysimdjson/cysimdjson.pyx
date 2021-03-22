@@ -116,6 +116,15 @@ cdef class JSONArray:
 		return self.Array.size()
 
 
+	def __iter__(self):
+
+		def _generator(i):
+			return self[i]
+
+		for i in range(len(self)):
+			yield _generator(i)
+
+
 	def at_pointer(JSONElement self, key):
 		cdef simdjson_element v
 		cdef int ok
@@ -150,6 +159,24 @@ cdef class JSONElement:
 		key_raw = key.encode('utf-8')
 		ok = getitem_from_element(self.Document, key_raw, v)
 		return ok == 0
+
+
+	def __iter__(self):
+
+		def _generator(_key):
+			return _key
+
+		for _key in self.keys():
+			yield _generator(_key)
+
+
+	def items(self):
+
+		def _generator(_key):
+			return _key, self[_key]
+
+		for _key in self.keys():
+			yield _generator(_key)
 
 
 	def __getitem__(JSONElement self, key):
