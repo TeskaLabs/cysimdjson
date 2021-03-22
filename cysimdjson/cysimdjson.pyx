@@ -116,13 +116,11 @@ cdef class JSONArray:
 		return self.Array.size()
 
 
-	def __iter__(self):
-
-		def _generator(i):
-			return self[i]
-
-		for i in range(len(self)):
-			yield _generator(i)
+	def __iter__(JSONArray self):
+		cdef simdjson_element v
+		for key in range(self.Array.size()):
+			getitem_from_array(self.Array, key, v)
+			yield _wrap_element(v)
 
 
 	def at_pointer(JSONElement self, key):
