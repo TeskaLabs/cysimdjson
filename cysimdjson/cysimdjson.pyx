@@ -119,8 +119,9 @@ cdef class JSONArray:
 	def __iter__(JSONArray self):
 
 		cdef simdjson_object.iterator it = self.Array.begin()
+		cdef simdjson_object.iterator it_end = self.Array.end()
 
-		while it != self.Array.end():
+		while it != it_end:
 			yield _wrap_element(it.value())
 			preincrement(it)
 
