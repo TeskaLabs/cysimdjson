@@ -161,20 +161,23 @@ cdef class JSONElement:
 
 	def __iter__(self):
 
-		def _generator(_key):
-			return _key
-
 		for _key in self.keys():
-			yield _generator(_key)
+			yield _key
 
 
 	def items(self):
 
-		def _generator(_key):
-			return _key, self[_key]
+		cdef simdjson_element v
 
 		for _key in self.keys():
-			yield _generator(_key)
+			key_raw = _key.encode('utf-8')
+			ok = getitem_from_element(self.Document, key_raw, v)
+
+			# Dictionary changed during iteration
+			if ok != 0:
+				raise ValueError()
+
+			yield _key, _wrap_element(v)
 
 
 	def __getitem__(JSONElement self, key):
