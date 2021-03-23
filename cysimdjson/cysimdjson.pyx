@@ -48,7 +48,20 @@ cdef extern from "jsoninter.h":
 		simdjson_element_type type()
 
 	cppclass simdjson_array:
+		cppclass iterator:
+			iterator()
+			simdjson_object operator*()
+			iterator operator++()
+			bint operator==(iterator)
+			bint operator!=(iterator)
+
+			string_view key()
+			simdjson_element value()
+
 		simdjson_array()
+		iterator begin()
+		iterator end()
+
 		size_t size()
 
 	cppclass simdjson_parser:
