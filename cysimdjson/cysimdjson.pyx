@@ -50,13 +50,9 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_array:
 		cppclass iterator:
 			iterator()
-			simdjson_array operator*()
-			iterator operator++()
-			bint operator==(iterator)
+			simdjson_element operator*()
+			operator++()
 			bint operator!=(iterator)
-
-			string_view key()
-			simdjson_element value()
 
 		simdjson_array()
 		iterator begin()
@@ -134,8 +130,11 @@ cdef class JSONArray:
 		cdef simdjson_object.iterator it = self.Array.begin()
 		cdef simdjson_object.iterator it_end = self.Array.end()
 
+		cdef simdjson_element element
+
 		while it != it_end:
-			yield _wrap_element(it.value())
+			element = *it
+			yield _wrap_element(element)
 			preincrement(it)
 
 
