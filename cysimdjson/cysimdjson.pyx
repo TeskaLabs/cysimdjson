@@ -117,10 +117,12 @@ cdef class JSONArray:
 
 
 	def __iter__(JSONArray self):
-		cdef simdjson_element v
-		for key in range(self.Array.size()):
-			getitem_from_array(self.Array, key, v)
-			yield _wrap_element(v)
+
+		cdef simdjson_object.iterator it = self.Array.begin()
+
+		while it != self.Array.end():
+			yield _wrap_element(it.value())
+			preincrement(it)
 
 
 	def at_pointer(JSONElement self, key):
