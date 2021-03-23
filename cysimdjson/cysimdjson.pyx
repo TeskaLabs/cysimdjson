@@ -50,7 +50,7 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_array:
 		cppclass iterator:
 			iterator()
-			simdjson_element operator*()
+			simdjson_element call "operator*()"()
 			operator++()
 			bint operator!=(iterator)
 
@@ -133,7 +133,7 @@ cdef class JSONArray:
 		cdef simdjson_element element
 
 		while it != it_end:
-			element = *it
+			element = it.call()
 			yield _wrap_element(element)
 			preincrement(it)
 
