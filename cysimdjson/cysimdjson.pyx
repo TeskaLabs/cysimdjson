@@ -4,6 +4,7 @@ from libcpp cimport bool
 from libcpp.string cimport string
 from cpython.bytes cimport PyBytes_AsStringAndSize
 from cython.operator cimport preincrement
+from cython.operator cimport dereference
 
 cdef extern from "string_view" namespace "std":
 	cppclass string_view:
@@ -50,7 +51,7 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_array:
 		cppclass iterator:
 			iterator()
-			simdjson_element call "operator*()"()
+			simdjson_element operator*()
 			operator++()
 			bint operator!=(iterator)
 
@@ -133,7 +134,7 @@ cdef class JSONArray:
 		cdef simdjson_element element
 
 		while it != it_end:
-			element = it.call()
+			element = dereference(it)
 			yield _wrap_element(element)
 			preincrement(it)
 
