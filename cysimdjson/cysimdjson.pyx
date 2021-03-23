@@ -50,7 +50,7 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_array:
 		cppclass iterator:
 			iterator()
-			simdjson_object operator*()
+			simdjson_array operator*()
 			iterator operator++()
 			bint operator==(iterator)
 			bint operator!=(iterator)
