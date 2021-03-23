@@ -162,7 +162,7 @@ cdef class JSONElement:
 	def __iter__(self):
 
 		for _key in self.keys():
-			yield _key.decode('utf-8')
+			yield _key
 
 
 	def items(self):
@@ -170,13 +170,8 @@ cdef class JSONElement:
 		cdef simdjson_element v
 
 		for _key in self.keys():
-			ok = getitem_from_element(self.Document, _key, v)
-
-			# Dictionary changed during iteration
-			if ok != 0:
-				raise ValueError()
-
-			yield _key.decode('utf-8'), _wrap_element(v)
+			getitem_from_element(self.Document, _key.encode('utf-8'), v)
+			yield _key, _wrap_element(v)
 
 
 	def __getitem__(JSONElement self, key):
@@ -213,7 +208,7 @@ cdef class JSONElement:
 		cdef simdjson_object.iterator it = obj.begin()
 		while it != obj.end():
 			sv = it.key()
-			yield string_view_to_string(sv)
+			yield string_view_to_string(sv).decode("utf-8")
 			preincrement(it)
 
 
