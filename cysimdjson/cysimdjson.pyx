@@ -128,8 +128,8 @@ cdef class JSONArray:
 
 	def __iter__(JSONArray self):
 
-		cdef simdjson_object.iterator it = self.Array.begin()
-		cdef simdjson_object.iterator it_end = self.Array.end()
+		cdef simdjson_array.iterator it = self.Array.begin()
+		cdef simdjson_array.iterator it_end = self.Array.end()
 
 		cdef simdjson_element element
 
