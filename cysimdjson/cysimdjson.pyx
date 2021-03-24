@@ -183,11 +183,21 @@ cdef class JSONElement:
 
 	def items(self):
 
+		cdef int ok
+		cdef string_view sv
 		cdef simdjson_element v
 
-		for _key in self.keys():
-			getitem_from_element(self.Document, _key.encode('utf-8'), v)
-			yield _key, _wrap_element(v)
+		cdef simdjson_object obj = to_object(self.Document, &ok)
+		if ok != 0:
+			raise ValueError()
+
+		cdef simdjson_object.iterator it = obj.begin()
+		while it != obj.end():
+			sv = it.key()
+			v = it.value()
+
+			yield string_view_to_string(sv), _wrap_element(v)
+			preincrement(it)
 
 
 	def __getitem__(JSONElement self, key):
