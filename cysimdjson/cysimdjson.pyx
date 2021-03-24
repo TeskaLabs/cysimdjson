@@ -197,7 +197,7 @@ cdef class JSONElement:
 			sv = it.key()
 			v = it.value()
 
-			yield string_view_to_string(sv), _wrap_element(v)
+			yield dereference(string_view_to_string(sv)), _wrap_element(v)
 			preincrement(it)
 
 
@@ -235,7 +235,7 @@ cdef class JSONElement:
 		cdef simdjson_object.iterator it = obj.begin()
 		while it != obj.end():
 			sv = it.key()
-			yield string_view_to_string(sv)
+			yield dereference(string_view_to_string(sv))
 			preincrement(it)
 
 
