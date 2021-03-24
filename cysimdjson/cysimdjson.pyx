@@ -1,4 +1,4 @@
-# cython: language_level=3
+# cython: language_level=3, c_string_type=unicode, c_string_encoding=utf8
 
 from libcpp cimport bool
 from libcpp.string cimport string
@@ -83,7 +83,7 @@ cdef extern from "jsoninter.h":
 	cdef simdjson_array to_array(simdjson_element & value, int * ok)
 	cdef simdjson_object to_object(simdjson_element & value, int * ok)
 
-	string string_view_to_string(string_view sv)
+	char* string_view_to_string(string_view sv)
 	string get_active_implementation()
 
 
@@ -224,7 +224,7 @@ cdef class JSONElement:
 		cdef simdjson_object.iterator it = obj.begin()
 		while it != obj.end():
 			sv = it.key()
-			yield string_view_to_string(sv).decode("utf-8")
+			yield string_view_to_string(sv)
 			preincrement(it)
 
 
