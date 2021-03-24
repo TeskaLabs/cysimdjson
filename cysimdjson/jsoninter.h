@@ -155,9 +155,14 @@ inline dom::object to_object(dom::element & value, int * ok) {
 }
 
 
-inline const char * string_view_to_string(std::string_view sv) {
-	//TODO: This creates a string copy
-	return std::string(sv).c_str();
+inline PyObject * string_view_to_string(std::string_view sv) {
+	// This creates a string copy, which ensures termination by \0
+	std::string str = std::string(string_view_object);
+
+	return PyUnicode_FromStringAndSize(
+		str.c_str(),
+		str.length()
+	);
 }
 
 inline std::string get_active_implementation() {
