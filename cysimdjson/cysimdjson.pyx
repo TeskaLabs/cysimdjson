@@ -84,7 +84,7 @@ cdef extern from "jsoninter.h":
 	cdef simdjson_array to_array(simdjson_element & value, int * ok)
 	cdef simdjson_object to_object(simdjson_element & value, int * ok)
 
-	PyObject * string_view_to_string(string_view sv)
+	PyObject * string_view_to_python_string(string_view sv)
 	string get_active_implementation()
 
 
@@ -197,7 +197,7 @@ cdef class JSONElement:
 			sv = it.key()
 			v = it.value()
 
-			yield <object> string_view_to_string(sv), _wrap_element(v)
+			yield <object> string_view_to_python_string(sv), _wrap_element(v)
 			preincrement(it)
 
 
@@ -235,7 +235,7 @@ cdef class JSONElement:
 		cdef simdjson_object.iterator it = obj.begin()
 		while it != obj.end():
 			sv = it.key()
-			yield <object> string_view_to_string(sv)
+			yield <object> string_view_to_python_string(sv)
 			preincrement(it)
 
 
