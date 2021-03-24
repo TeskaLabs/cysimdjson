@@ -4,6 +4,8 @@ from libcpp cimport bool
 from libcpp.string cimport string
 from cpython.bytes cimport PyBytes_AsStringAndSize
 from cython.operator cimport preincrement
+from cython.operator cimport dereference
+from cpython.ref cimport PyObject
 
 cdef extern from "string_view" namespace "std":
 	cppclass string_view:
@@ -48,7 +50,16 @@ cdef extern from "jsoninter.h":
 		simdjson_element_type type()
 
 	cppclass simdjson_array:
+		cppclass iterator:
+			iterator()
+			simdjson_element operator*()
+			operator++()
+			bint operator!=(iterator)
+
 		simdjson_array()
+		iterator begin()
+		iterator end()
+
 		size_t size()
 
 	cppclass simdjson_parser:
@@ -73,7 +84,7 @@ cdef extern from "jsoninter.h":
 	cdef simdjson_array to_array(simdjson_element & value, int * ok)
 	cdef simdjson_object to_object(simdjson_element & value, int * ok)
 
-	string string_view_to_string(string_view sv)
+	PyObject * string_view_to_python_string(string_view & sv)
 	string get_active_implementation()
 
 
@@ -116,6 +127,19 @@ cdef class JSONArray:
 		return self.Array.size()
 
 
+	def __iter__(JSONArray self):
+
+		cdef simdjson_array.iterator it = self.Array.begin()
+		cdef simdjson_array.iterator it_end = self.Array.end()
+
+		cdef simdjson_element element
+
+		while it != it_end:
+			element = dereference(it)
+			yield _wrap_element(element)
+			preincrement(it)
+
+
 	def at_pointer(JSONElement self, key):
 		cdef simdjson_element v
 		cdef int ok
@@ -152,6 +176,31 @@ cdef class JSONElement:
 		return ok == 0
 
 
+	def __iter__(self):
+
+		for _key in self.keys():
+			yield _key
+
+
+	def items(self):
+
+		cdef int ok
+		cdef string_view sv
+		cdef simdjson_element v
+
+		cdef simdjson_object obj = to_object(self.Document, &ok)
+		if ok != 0:
+			raise ValueError()
+
+		cdef simdjson_object.iterator it = obj.begin()
+		while it != obj.end():
+			sv = it.key()
+			v = it.value()
+
+			yield <object> string_view_to_python_string(sv), _wrap_element(v)
+			preincrement(it)
+
+
 	def __getitem__(JSONElement self, key):
 		cdef simdjson_element v
 		cdef int ok
@@ -186,7 +235,7 @@ cdef class JSONElement:
 		cdef simdjson_object.iterator it = obj.begin()
 		while it != obj.end():
 			sv = it.key()
-			yield string_view_to_string(sv)
+			yield <object> string_view_to_python_string(sv)
 			preincrement(it)
 
 

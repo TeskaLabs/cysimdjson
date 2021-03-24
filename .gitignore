@@ -2,3 +2,4 @@
 build
 cysimdjson/cysimdjson.cpp
 cysimdjson.*.so
+__pycache__
