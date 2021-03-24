@@ -84,7 +84,7 @@ cdef extern from "jsoninter.h":
 	cdef simdjson_array to_array(simdjson_element & value, int * ok)
 	cdef simdjson_object to_object(simdjson_element & value, int * ok)
 
-	PyObject * string_view_to_python_string(string_view sv)
+	PyObject * string_view_to_python_string(string_view & sv)
 	string get_active_implementation()
 
 

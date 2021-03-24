@@ -155,7 +155,7 @@ inline dom::object to_object(dom::element & value, int * ok) {
 }
 
 
-inline PyObject * string_view_to_python_string(std::string_view sv) {
+inline PyObject * string_view_to_python_string(std::string_view & sv) {
 	return PyUnicode_FromStringAndSize(
 		sv.data(),
 		sv.length()
