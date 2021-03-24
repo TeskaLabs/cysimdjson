@@ -155,7 +155,7 @@ inline dom::object to_object(dom::element & value, int * ok) {
 }
 
 
-inline char * string_view_to_string(std::string_view sv) {
+inline const char * string_view_to_string(std::string_view sv) {
 	//TODO: This creates a string copy
 	return std::string(sv).c_str();
 }

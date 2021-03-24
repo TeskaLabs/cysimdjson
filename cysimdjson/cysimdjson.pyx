@@ -83,7 +83,7 @@ cdef extern from "jsoninter.h":
 	cdef simdjson_array to_array(simdjson_element & value, int * ok)
 	cdef simdjson_object to_object(simdjson_element & value, int * ok)
 
-	char* string_view_to_string(string_view sv)
+	const char* string_view_to_string(string_view sv)
 	string get_active_implementation()
 
 
