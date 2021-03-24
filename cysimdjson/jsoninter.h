@@ -156,12 +156,9 @@ inline dom::object to_object(dom::element & value, int * ok) {
 
 
 inline PyObject * string_view_to_python_string(std::string_view sv) {
-	// This creates a string copy, which ensures termination by \0
-	std::string str = std::string(sv);
-
 	return PyUnicode_FromStringAndSize(
-		str.c_str(),
-		str.length()
+		sv.data(),
+		sv.length()
 	);
 }
 
