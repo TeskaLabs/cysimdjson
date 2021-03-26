@@ -65,8 +65,8 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_parser:
 		simdjson_parser()
 		simdjson_parser(size_t max_capacity)
-		simdjson_element load(string)
-		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed)
+		simdjson_element load(string) except +
+		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except +
 
 	cdef int getitem_from_element(simdjson_element & element, string & key, simdjson_element & value)
 	cdef int getitem_from_array(simdjson_array & array, int key, simdjson_element & value)
