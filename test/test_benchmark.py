@@ -117,7 +117,7 @@ def main():
 	test_set = [
 		perftest_orjson_parser,
 		perftest_pysimdjson_parser,
-		# perftest_libpy_simdjson_parser,
+	#	perftest_libpy_simdjson_parser,
 		perftest_pythonjson_loads,
 		perftest_cysimdjson_parse,
 		perftest_cysimdjson_pad_parse,

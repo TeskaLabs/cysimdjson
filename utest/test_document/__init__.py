@@ -28,3 +28,11 @@ class JSONDocumentTestCases(unittest.TestCase):
 			"key4": 40,
 			"key5": "50",
 		}, _dict)
+
+
+
+	def test_parser_failure_01(self):
+
+		parser = cysimdjson.JSONParser()
+		with self.assertRaises(ValueError) as context:
+			json_parsed = parser.parse(b"Definitively not a JSON")
