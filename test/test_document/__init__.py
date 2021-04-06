@@ -31,6 +31,16 @@ class JSONDocumentTestCases(unittest.TestCase):
 
 
 
+	def test_contains_01(self):
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'document.json'), 'rb') as fo:
+			json_parsed = parser.parse(fo.read())
+
+		self.assertEqual("notdocument" in json_parsed, False)
+		self.assertEqual("document" in json_parsed, True)
+
+
 	def test_parser_failure_01(self):
 
 		parser = cysimdjson.JSONParser()
