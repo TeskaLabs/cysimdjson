@@ -137,7 +137,7 @@ pip3 install orjson
 pip3 install pysimdjson
 pip3 install libpy_simdjson
 python3 setup.py build_ext --inplace
-PYTHONPATH=. python3 ./test/test_benchmark.py
+PYTHONPATH=. python3 ./perftest/test_benchmark.py
 ```
 
 ## Manual build

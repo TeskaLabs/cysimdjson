@@ -32,4 +32,4 @@ jobs:
 
     - name: Unit test
       run: |
-        python3 -m unittest utest
+        python3 -m unittest test
