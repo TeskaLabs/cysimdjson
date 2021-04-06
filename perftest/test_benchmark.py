@@ -99,20 +99,6 @@ def perftest_cysimdjson_parse(jsonfile, number):
 	)
 
 
-def perftest_cysimdjson_pad_parse(jsonfile, number):
-	import cysimdjson
-
-	with open(jsonfile, 'rb') as f:
-		jsonb = f.read() + (b' ' * 1024)
-
-	parser = cysimdjson.JSONParser()
-
-	return benchmark(
-		"cysimdjson pad parse",
-		lambda: parser.parse_in_place(jsonb),
-		number=number
-	)
-
 def main():
 	test_set = [
 		perftest_orjson_parser,
@@ -120,7 +106,7 @@ def main():
 	#	perftest_libpy_simdjson_parser,
 		perftest_pythonjson_loads,
 		perftest_cysimdjson_parse,
-		perftest_cysimdjson_pad_parse,
+	#	perftest_cysimdjson_pad_parse,
 	]
 
 	jsonfile = jsonpath / "test.json"
