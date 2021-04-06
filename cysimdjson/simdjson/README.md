@@ -2,7 +2,7 @@
 
 https://github.com/simdjson
 
-Version v0.9.1
+Version v0.9.2
 
 ## Upgrade instructions:
 

@@ -1,4 +1,4 @@
-/* auto-generated on 2021-03-18 11:30:40 -0400. Do not edit! */
+/* auto-generated on 2021-03-18 11:31:38 -0400. Do not edit! */
 /* begin file include/simdjson.h */
 #ifndef SIMDJSON_H
 #define SIMDJSON_H
@@ -2045,6 +2045,25 @@ namespace std {
 #endif
 #endif
 
+
+
+#if SIMDJSON_CPLUSPLUS17
+// if we have C++, then fallthrough is a default attribute
+# define simdjson_fallthrough [[fallthrough]]
+// check if we have __attribute__ support
+#elif defined(__has_attribute)
+// check if we have the __fallthrough__ attribute
+#if __has_attribute(__fallthrough__)
+// we are good to go:
+# define simdjson_fallthrough                    __attribute__((__fallthrough__))
+#endif
+#endif
+// on some systems, we simply do not have support for fallthrough, so use a default:
+#ifndef simdjson_fallthrough
+# define simdjson_fallthrough do {} while (0)  /* fallthrough */
+#endif
+
+
 #endif // SIMDJSON_COMMON_DEFS_H
 /* end file include/simdjson/common_defs.h */
 
@@ -2059,7 +2078,7 @@ SIMDJSON_DISABLE_UNDESIRED_WARNINGS
 #define SIMDJSON_SIMDJSON_VERSION_H
 
 /** The version of simdjson being used (major.minor.revision) */
-#define SIMDJSON_VERSION 0.9.1
+#define SIMDJSON_VERSION 0.9.2
 
 namespace simdjson {
 enum {
@@ -2074,7 +2093,7 @@ enum {
   /**
    * The revision (major.minor.REVISION) of simdjson being used.
    */
-  SIMDJSON_VERSION_REVISION = 1
+  SIMDJSON_VERSION_REVISION = 2
 };
 } // namespace simdjson
 
@@ -2262,13 +2281,13 @@ struct simdjson_result_base : protected std::pair<T, error_code> {
 
   /**
    * Get the result value. This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline const T& value_unsafe() const& noexcept;
 
   /**
    * Take the result value (move it). This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline T&& value_unsafe() && noexcept;
 
@@ -2353,13 +2372,13 @@ struct simdjson_result : public internal::simdjson_result_base<T> {
 
   /**
    * Get the result value. This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline const T& value_unsafe() const& noexcept;
 
   /**
    * Take the result value (move it). This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline T&& value_unsafe() && noexcept;
 
@@ -18653,13 +18672,13 @@ struct implementation_simdjson_result_base {
 
   /**
    * Get the result value. This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline const T& value_unsafe() const& noexcept;
 
   /**
    * Take the result value (move it). This function is safe if and only
-   * the error() method returns a value that evaluates to false.
+   * the error() method returns a value that evoluates to false.
    */
   simdjson_really_inline T&& value_unsafe() && noexcept;
 
@@ -21747,6 +21766,16 @@ simdjson_warn_unused simdjson_really_inline error_code json_iterator::skip_child
       _depth--;
       if (depth() <= parent_depth) { return SUCCESS; }
       break;
+    case '"':
+      if(*peek() == ':') {
+        // we are at a key!!! This is
+        // only possible if someone searched
+        // for a key and the key was not found.
+        logger::log_value(*this, "key");
+        advance(); // eat up the ':'
+        break; // important!!!
+      }
+      simdjson_fallthrough;
     // Anything else must be a scalar value
     default:
       // For the first scalar, we will have incremented depth already, so we decrement it here.
