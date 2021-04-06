@@ -3,16 +3,9 @@
 
 using namespace simdjson;
 
-// To avoid naming collisions between dom::object and python namespace
-using simdjson_object = dom::object;
-using simdjson_element_type = dom::element_type;
-using simdjson_element = dom::element;
-using simdjson_array = dom::array;
-using simdjson_parser = dom::parser;
 
-
-inline int getitem_from_element(dom::element & element, const std::string & key, dom::element & value) {
-	auto error = element[key].get(value);
+inline int getitem_from_object(dom::object & obj, const std::string & key, dom::element & value) {
+	auto error = obj[key].get(value);
 	if (error) {
 		return -1;
 	}
@@ -30,8 +23,8 @@ inline int getitem_from_array(dom::array & array, int key, dom::element & value)
 }
 
 
-inline int at_pointer_element(dom::element & element, std::string & key, dom::element & value) {
-	auto error = element.at_pointer(key).get(value);
+inline int at_pointer_object(dom::object & obj, std::string & key, dom::element & value) {
+	auto error = obj.at_pointer(key).get(value);
 	if (error) {
 		return -1;
 	}

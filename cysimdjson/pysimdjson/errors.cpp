@@ -11,8 +11,7 @@
  *
  *      simd_element at(int) except +simdjson_error_handler
  */
-void
-simdjson_error_handler() {
+void simdjson_error_handler() {
     using namespace simdjson;
 
     try {
