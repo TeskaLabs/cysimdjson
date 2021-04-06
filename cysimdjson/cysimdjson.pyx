@@ -11,6 +11,8 @@ cdef extern from "string_view" namespace "std":
 	cppclass string_view:
 		pass
 
+cdef extern from "pysimdjson/errors.h":
+	cdef void simdjson_error_handler()
 
 cdef extern from "jsoninter.h" namespace "simdjson_element_type":
 	cdef simdjson_element_type STRING
@@ -65,24 +67,24 @@ cdef extern from "jsoninter.h":
 	cppclass simdjson_parser:
 		simdjson_parser()
 		simdjson_parser(size_t max_capacity)
-		simdjson_element load(string) except +
-		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except +
+		simdjson_element load(string) except + simdjson_error_handler
+		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler
 
-	cdef int getitem_from_element(simdjson_element & element, string & key, simdjson_element & value)
-	cdef int getitem_from_array(simdjson_array & array, int key, simdjson_element & value)
+	cdef int getitem_from_element(simdjson_element & element, string & key, simdjson_element & value) except + simdjson_error_handler
+	cdef int getitem_from_array(simdjson_array & array, int key, simdjson_element & value) except + simdjson_error_handler
 
-	cdef int at_pointer_element(simdjson_element & element, string & key, simdjson_element & value)
-	cdef int at_pointer_array(simdjson_array & array, string & key, simdjson_element & value)
+	cdef int at_pointer_element(simdjson_element & element, string & key, simdjson_element & value) except + simdjson_error_handler
+	cdef int at_pointer_array(simdjson_array & array, string & key, simdjson_element & value) except + simdjson_error_handler
 
-	cdef bool compare_type(simdjson_element_type a, simdjson_element_type b)
-	cdef object to_string(simdjson_element & value, int * ok)
-	cdef object to_int64(simdjson_element & value, int * ok)
-	cdef object to_uint64(simdjson_element & value, int * ok)
-	cdef object to_double(simdjson_element & value, int * ok)
-	cdef object to_bool(simdjson_element & value, int * ok)
+	cdef bool compare_type(simdjson_element_type a, simdjson_element_type b) except + simdjson_error_handler
+	cdef object to_string(simdjson_element & value, int * ok) except + simdjson_error_handler
+	cdef object to_int64(simdjson_element & value, int * ok) except + simdjson_error_handler
+	cdef object to_uint64(simdjson_element & value, int * ok) except + simdjson_error_handler
+	cdef object to_double(simdjson_element & value, int * ok) except + simdjson_error_handler
+	cdef object to_bool(simdjson_element & value, int * ok) except + simdjson_error_handler
 
-	cdef simdjson_array to_array(simdjson_element & value, int * ok)
-	cdef simdjson_object to_object(simdjson_element & value, int * ok)
+	cdef simdjson_array to_array(simdjson_element & value, int * ok) except + simdjson_error_handler
+	cdef simdjson_object to_object(simdjson_element & value, int * ok) except + simdjson_error_handler
 
 	PyObject * string_view_to_python_string(string_view & sv)
 	string get_active_implementation()
