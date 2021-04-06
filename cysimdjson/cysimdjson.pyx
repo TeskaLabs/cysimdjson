@@ -28,316 +28,193 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson":
 		SIMDJSON_VERSION_MINOR
 		SIMDJSON_VERSION_REVISION
 
-
-cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
-
-	cdef cppclass simdjson_object "simdjson::dom::object":
-
-		cppclass iterator:
-			iterator()
-
-			simdjson_object operator*()
-			iterator operator++()
-			bint operator==(iterator)
-			bint operator!=(iterator)
-
-			string_view key()
-			uint32_t key_length()
-			const char *key_c_str()
-			simdjson_element value()
-
-		simdjson_object()
-
-		iterator begin()
-		iterator end()
-
-		size_t size()
-
-		simdjson_element at_pointer(const char*) except +simdjson_error_handler
-		simdjson_element operator[](const char*) except +simdjson_error_handler
+	cdef enum simdjson_json_type "simdjson::ondemand::json_type":
+		json_type_array "simdjson::ondemand::json_type::array",
+		json_type_object "simdjson::ondemand::json_type::object",
+		json_type_number "simdjson::ondemand::json_type::number",
+		json_type_string "simdjson::ondemand::json_type::string",
+		json_type_boolean "simdjson::ondemand::json_type::boolean",
+		json_type_null "simdjson::ondemand::json_type::null"
 
 
-	cdef cppclass simdjson_array "simdjson::dom::array":
+cdef extern from "simdjson/simdjson.h" namespace "simdjson::ondemand":
 
-		cppclass iterator:
-			iterator()
-			
-			operator++()
-			bint operator!=(iterator)
-			simdjson_element operator*()
+
+	cdef cppclass simdjson_value "simdjson::ondemand::value":
+
+		simdjson_value()
+
+		simdjson_json_type type() except +simdjson_error_handler
+		bool get_bool() except +simdjson_error_handler
+
+
+	cdef cppclass simdjson_array "simdjson::ondemand::array":
 
 		simdjson_array()
 
-		iterator begin()
-		iterator end()
-
-		size_t size()
-		size_t number_of_slots()
-
-		# simd_element at(int) except +simdjson_error_handler
-		# simd_element at_pointer(const char*) except +simdjson_error_handler
+		simdjson_array_iterator begin()
+		simdjson_array_iterator end()
 
 
-	cdef cppclass simdjson_element "simdjson::dom::element":
+	cdef cppclass simdjson_array_iterator "simdjson::ondemand::array_iterator":
 
-		simdjson_element()
-
-		simdjson_element_type type() except +simdjson_error_handler
-
-		const char *get_c_str() except +simdjson_error_handler
-		size_t get_string_length() except +simdjson_error_handler
-
-		simdjson_array get_array() except +simdjson_error_handler
-		simdjson_element get_object() except +simdjson_error_handler
+		simdjson_array_iterator()
+		
+		operator++()
+		bint operator!=(simdjson_array_iterator)
+		bint operator==(simdjson_array_iterator)
+		simdjson_value operator*()
 
 
-	cdef cppclass simdjson_parser "simdjson::dom::parser":
+	cdef cppclass simdjson_object "simdjson::ondemand::object":
+
+		simdjson_object()
+
+		simdjson_value find_field(const char *key) except +simdjson_error_handler
+
+
+	cdef cppclass simdjson_document "simdjson::ondemand::document":
+
+		simdjson_document()
+
+		simdjson_json_type type() except +simdjson_error_handler
+		bool get_bool() except +simdjson_error_handler
+
+
+	cdef cppclass simdjson_parser "simdjson::ondemand::parser":
 
 		simdjson_parser()
 		simdjson_parser(size_t max_capacity)
 
-		simdjson_element load(string) except + simdjson_error_handler
-		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler
-
-
-cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom::element_type":
-	cdef enum simdjson_element_type "simdjson::dom::element_type":
-		OBJECT,
-		ARRAY,
-		STRING,
-		INT64,
-		UINT64,
-		DOUBLE,
-		BOOL,
-		NULL_VALUE
+		simdjson_document iterate(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler
 
 
 cdef extern from "jsoninter.h":
 
-	cdef int getitem_from_object(simdjson_object & object, string & key, simdjson_element & value) except + simdjson_error_handler
-	cdef int getitem_from_array(simdjson_array & array, int key, simdjson_element & value) except + simdjson_error_handler
-
-	cdef int at_pointer_object(simdjson_object & element, string & key, simdjson_element & value) except + simdjson_error_handler
-	cdef int at_pointer_array(simdjson_array & array, string & key, simdjson_element & value) except + simdjson_error_handler
-
-	cdef bool compare_type(simdjson_element_type a, simdjson_element_type b) except + simdjson_error_handler
-	cdef object to_string(simdjson_element & value, int * ok) except + simdjson_error_handler
-	cdef object to_int64(simdjson_element & value, int * ok) except + simdjson_error_handler
-	cdef object to_uint64(simdjson_element & value, int * ok) except + simdjson_error_handler
-	cdef object to_double(simdjson_element & value, int * ok) except + simdjson_error_handler
-	cdef object to_bool(simdjson_element & value, int * ok) except + simdjson_error_handler
-
-	cdef simdjson_array to_array(simdjson_element & value, int * ok) except + simdjson_error_handler
-	cdef simdjson_object to_object(simdjson_element & value, int * ok) except + simdjson_error_handler
-
 	PyObject * string_view_to_python_string(string_view & sv)
 	string get_active_implementation()
+
+	void parser_helper_iterate(simdjson_document document, simdjson_parser Parser, char * data_ptr, Py_ssize_t pysize, Py_ssize_t padding)
+	
+	void document_helper_to_object(simdjson_document document, simdjson_object obj) except + simdjson_error_handler
+	void document_helper_to_array(simdjson_document document, simdjson_array arr) except + simdjson_error_handler
+	cdef object document_helper_to_py_string(simdjson_document & document) except + simdjson_error_handler
+	cdef object document_helper_to_py_number(simdjson_document & document) except + simdjson_error_handler
+
+	void value_helper_to_object(simdjson_value & value, simdjson_object obj) except + simdjson_error_handler
+	void value_helper_to_array(simdjson_value & value, simdjson_array arr) except + simdjson_error_handler
+	cdef object value_helper_to_py_string(simdjson_value & value) except + simdjson_error_handler
+	cdef object value_helper_to_py_number(simdjson_value & value) except + simdjson_error_handler
 
 
 cdef class JSONArray:
 
-	cdef simdjson_array Array
+	cdef:
+		JSONDocument Document
+		simdjson_array Array
+		int Length
 
 
-	def __cinit__(JSONArray self):
-		self.Array = simdjson_array()
-
-
-	@staticmethod
-	cdef inline JSONArray build_JSONArray(simdjson_element value):
-		cdef JSONArray self = JSONArray.__new__(JSONArray)
-		cdef int ok
-		self.Array = to_array(value, &ok)
-		if ok != 0:
-			raise ValueError()
-		return self
-
-
-	def __contains__(JSONArray self, item):
-		# This is a full scan
-		for i in range(len(self)):
-			if self[i] == item:
-				return True
-		return False
-
-
-	def __getitem__(JSONArray self, key: int):
-		cdef simdjson_element v
-		ok = getitem_from_array(self.Array, key, v)
-		if ok != 0:
-			raise IndexError("Not found '{}'".format(key))
-		return _wrap_element(v)
-
-
-	def __len__(JSONArray self):
-		return self.Array.size()
+	def __cinit__(self, document):
+		self.Document = document
+		self.Length = -1
 
 
 	def __iter__(JSONArray self):
 
-		cdef simdjson_array.iterator it = self.Array.begin()
-		cdef simdjson_array.iterator it_end = self.Array.end()
+		cdef simdjson_array_iterator it = self.Array.begin()
+		cdef simdjson_array_iterator it_end = self.Array.end()
 
-		cdef simdjson_element element
+		cdef simdjson_value value
 
 		while it != it_end:
-			element = dereference(it)
-			yield _wrap_element(element)
+			value = dereference(it)
+			yield _unwrap_value(self.Document, value)
 			preincrement(it)
 
 
-	def at_pointer(JSONArray self, key):
-		cdef simdjson_element v
-		cdef int ok
+	def __contains__(JSONArray self, item):
+		# Full scan
+		for i in self:
+			if i == item:
+				return True
+		return False
 
-		key_raw = key.encode('utf-8')
-		ok = at_pointer_array(self.Array, key_raw, v)
-		if ok != 0:
-			raise KeyError("Not found '{}'".format(key))
 
-		return _wrap_element(v)
+	def __len__(JSONArray self):
+		#TODO: Once ready in SIMDJSON: return self.Array.size()
+
+		if self.Length >= 0:
+			return self.Length
+
+		cdef int cnt = 0
+	
+		cdef simdjson_array_iterator it = self.Array.begin()
+		cdef simdjson_array_iterator it_end = self.Array.end()
+		while it != it_end:
+			cnt += 1
+			preincrement(it)
+
+		self.Length = cnt
+
+		return cnt
 
 
 cdef class JSONObject:
 
-	cdef simdjson_object Object
+	cdef:
+		JSONDocument Document
+		simdjson_object Object
 
 
-	def __cinit__(JSONObject self):
-		self.Object = simdjson_object()
-
-
-	@staticmethod
-	cdef inline JSONObject build_JSONObject(simdjson_element value):
-		cdef JSONObject self = JSONObject.__new__(JSONObject)
-		cdef int ok
-		self.Object = to_object(value, &ok)
-		if ok != 0:
-			raise ValueError()
-		return self
-
-
-	def __contains__(JSONObject self, key):
-		cdef simdjson_element v
-		cdef int ok
-		key_raw = key.encode('utf-8')
-		ok = getitem_from_object(self.Object, key_raw, v)
-		return ok == 0
-
-
-	def __iter__(self):
-		for _key in self.keys():
-			yield _key
-
-
-	def items(self):
-		cdef int ok
-		cdef string_view sv
-		cdef simdjson_element v
-
-		cdef simdjson_object.iterator it = self.Object.begin()
-		while it != self.Object.end():
-			sv = it.key()
-			v = it.value()
-
-			yield <object> string_view_to_python_string(sv), _wrap_element(v)
-			preincrement(it)
+	def __cinit__(self, document):
+		self.Document = document
 
 
 	def __getitem__(JSONObject self, key):
-		cdef simdjson_element v
-		cdef int ok
-
 		key_raw = key.encode('utf-8')
-		ok = getitem_from_object(self.Object, key_raw, v)
-		if ok != 0:
-			raise KeyError("Not found '{}'".format(key))
 
-		return _wrap_element(v)
+		cdef simdjson_value value
+		value = self.Object.find_field(key_raw)
 
-
-	def __len__(JSONObject self):
-		cdef int ok
-		cdef string_view sv
-
-		return self.Object.size()
+		return _unwrap_value(self.Document, value)
 
 
-	def keys(JSONObject self):
-		cdef int ok
-		cdef string_view sv
+cdef class JSONDocument:
 
-		cdef simdjson_object.iterator it = self.Object.begin()
-		while it != self.Object.end():
-			sv = it.key()
-			yield <object> string_view_to_python_string(sv)
-			preincrement(it)
+	cdef:
+		simdjson_document Document
 
 
-	def at_pointer(JSONObject self, key):
-		cdef simdjson_element v
-		cdef int ok
+	cdef get(JSONDocument self):
+		'''
+		Get top-level object
+		'''
+		cdef simdjson_json_type json_type = self.Document.type()
 
-		key_raw = key.encode('utf-8')
-		ok = at_pointer_object(self.Object, key_raw, v)
-		if ok != 0:
-			raise KeyError("Not found '{}'".format(key))
+		if json_type == json_type_object:
+			json_object = JSONObject(self)
+			document_helper_to_object(self.Document, json_object.Object)
+			return json_object
 
-		return _wrap_element(v)
+		if json_type == json_type_array:
+			json_array = JSONArray(self)
+			document_helper_to_array(self.Document, json_array.Array)
+			return json_array
 
+		if json_type == json_type_number:
+			return document_helper_to_py_number(self.Document)
 
-cdef class JSONObjectDocument(JSONObject):
-	'''
-	Represents a top-level JSON object (dictionary).
-	'''
+		if json_type == json_type_string:
+			return document_helper_to_py_string(self.Document)
 
-	cdef object Data
-	cdef simdjson_element Element
+		if json_type == json_type_boolean:
+			return self.Document.get_bool()
 
+		if json_type == json_type_null:
+			return None
 
-	def __cinit__(JSONObjectDocument self):
-		self.Data = None
-
-
-cdef inline JSONObjectDocument _build_JSONObjectDocument(simdjson_element element, object data):
-	cdef JSONObjectDocument self = JSONObjectDocument.__new__(JSONObjectDocument)
-
-	cdef int ok
-	self.Object = to_object(element, &ok)
-	if ok != 0:
-		raise ValueError("Not an JSON object.")
-
-	self.Element = element
-	self.Data = data
-
-	return self
-
-
-cdef class JSONArrayDocument(JSONArray):
-	'''
-	Represents a top-level JSON array.
-	'''
-
-	cdef object Data
-	cdef simdjson_element Element
-
-
-	def __cinit__(JSONArrayDocument self):
-		self.Data = None
-
-
-cdef inline JSONArrayDocument _build_JSONArrayDocument(simdjson_element element, object data):
-	cdef JSONArrayDocument self = JSONArrayDocument.__new__(JSONArrayDocument)
-
-	cdef int ok
-	self.Array = to_array(element, &ok)
-	if ok != 0:
-		raise ValueError("Not an JSON array.")
-
-	self.Element = element
-	self.Data = data
-
-	return self
+		raise ValueError("Unknown JSON type")
 
 
 cdef class JSONParser:
@@ -346,111 +223,71 @@ cdef class JSONParser:
 		simdjson_parser Parser
 
 
-	def __cinit__(self, max_capacity=None):
-		if max_capacity is not None:
-			self.Parser = simdjson_parser.simdjson_parser(int(max_capacity))
-		else:
-			self.Parser = simdjson_parser.simdjson_parser()
+	def __cinit__(self):
+		pass
 
 
-	def parse(self, event):
+	def parse(self, json):
+		json = json + b' ' * SIMDJSON_PADDING
+
 		cdef Py_ssize_t pysize
 		cdef char * data_ptr
-		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
+		cdef int rc = PyBytes_AsStringAndSize(json, &data_ptr, &pysize)
 		if rc == -1:
 			raise RuntimeError("Failed to get raw data")
 
-		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
-		return self._build(element, event)
+		doc = JSONDocument()
+		parser_helper_iterate(doc.Document, self.Parser, data_ptr, pysize, SIMDJSON_PADDING)
+		return doc.get()
 
 
-	def parse_in_place(self, event):
+	def parse_in_place(self, json,  padding: int):
 		'''
 		Skip the reallocation of the input event buffer.
 		This method is little bit faster than parse() but you have to ensure proper padding of the event.
 		'''
 		cdef Py_ssize_t pysize
 		cdef char * data_ptr
-		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
+		cdef int rc = PyBytes_AsStringAndSize(json, &data_ptr, &pysize)
 		if rc == -1:
 			raise RuntimeError("Failed to get raw data")
 
-		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 0)
-		return self._build(element, event)
-
-
-	def load(self, path):
-		cdef simdjson_element element = self.Parser.load(path)
-		return self._build(element, None)
-
-
-	cdef _build(self, simdjson_element element, event):
-		cdef simdjson_element_type et = element.type()
-		
-		if compare_type(et, OBJECT):
-			return _build_JSONObjectDocument(element, event)
-
-		elif compare_type(et, ARRAY):
-			return _build_JSONArrayDocument(element, event)
-
-		else:
-			return _wrap_element(element)
+		doc = JSONDocument()
+		parser_helper_iterate(doc.Document, self.Parser, data_ptr, pysize, padding)
+		return doc.get()
 
 
 	def active_implementation(self):
 		return get_active_implementation()
 
 
-cdef inline object _wrap_element(simdjson_element v):
-	cdef int ok
-	cdef simdjson_element_type et = v.type()
+cdef inline object _unwrap_value(document, simdjson_value v):
 
-	# String
-	if compare_type(et, STRING):
-		o = to_string(v, &ok)
-		if ok != 0:
-			raise ValueError()
-		return o
+	cdef simdjson_json_type json_type = v.type()
 
-	# INT64
-	if compare_type(et, INT64):
-		o = to_int64(v, &ok)
-		if ok != 0:
-			raise ValueError()
-		return o
+	if json_type == json_type_object:
+		json_object = JSONObject(document)
+		value_helper_to_object(v, json_object.Object)
+		return json_object
 
-	# DOUBLE
-	if compare_type(et, DOUBLE):
-		o = to_double(v, &ok)
-		if ok != 0:
-			raise ValueError()
-		return o
+	if json_type == json_type_array:
+		json_array = JSONArray(document)
+		value_helper_to_array(v, json_array.Array)
+		return json_array
 
-	# NULL / None
-	if compare_type(et, NULL_VALUE):
+	if json_type == json_type_number:
+		return value_helper_to_py_number(v)
+
+	if json_type == json_type_string:
+		return value_helper_to_py_string(v)
+
+	if json_type == json_type_boolean:
+		return v.get_bool()
+
+	if json_type == json_type_null:
 		return None
 
-	# UINT64
-	if compare_type(et, UINT64):
-		o = to_uint64(v, &ok)
-		if ok != 0:
-			raise ValueError()
-		return o
-
-	# BOOL
-	if compare_type(et, BOOL):
-		o = to_bool(v, &ok)
-		if ok != 0:
-			raise ValueError()
-		return o
-
-	if compare_type(et, OBJECT):
-		return JSONObject.build_JSONObject(v)
-
-	if compare_type(et, ARRAY):
-		return JSONArray.build_JSONArray(v)
-
-	raise ValueError()
+	raise ValueError("Unknown JSON type")
 
 
 MAXSIZE_BYTES = SIMDJSON_MAXSIZE_BYTES

@@ -17,9 +17,9 @@ class JSONArrayTestCases(unittest.TestCase):
 			json_parsed = parser.parse(fo.read())
 
 		ar = json_parsed['array']
-		self.assertEqual(len(ar), 10)
-		for i, n in enumerate(ar, 1):
-			self.assertEqual(i, n)
+
+		self.assertEqual(list(i for i in ar), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+		self.assertEqual(list(i for i in ar), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
 
 	def test_iter_02(self):
@@ -31,3 +31,15 @@ class JSONArrayTestCases(unittest.TestCase):
 
 		for i, n in enumerate(json_parsed, 1):
 			self.assertEqual(i, n)
+
+
+	def test_len_01(self):
+
+		parser = cysimdjson.JSONParser()
+		
+		with open(os.path.join(THIS_DIR, 'array.json'), 'rb') as fo:
+			json_parsed = parser.parse(fo.read())
+
+		ar = json_parsed['array']
+		self.assertEqual(len(ar), 10)
+		self.assertEqual(len(ar), 10)

@@ -5,5 +5,11 @@
 		"key3": "3",
 		"key4": 40,
 		"key5": "50"
-	}
+	},
+	"foo": "bar",
+	"true": true,
+	"false": false,
+	"null": null,
+	"int64": -1234567890,
+	"double": -1234567890.11,
 }
