@@ -29,6 +29,7 @@ extensions = [
 
 setup(
 	name='cysimdjson',
+	version="21.4-alpha",
 	description='Cython-based wrapper for SIMDJSON',
 	author='TeskaLabs Ltd',
 	author_email='info@teskalabs.com',
