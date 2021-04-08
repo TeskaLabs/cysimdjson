@@ -47,6 +47,7 @@ setup(
 	],
 	project_urls={
 		"Source": "https://github.com/TeskaLabs/cysimdjson",
+		'Tracker': 'https://github.com/TeskaLabs/cysimdjson/issues',
 	},
 	install_requires=[
 	],
