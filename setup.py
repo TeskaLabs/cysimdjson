@@ -34,7 +34,7 @@ extensions = [
 
 setup(
 	name='cysimdjson',
-	version="21.4-a4",
+	version="21.4a4",
 	description='Cython-based wrapper for SIMDJSON',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
@@ -42,13 +42,19 @@ setup(
 	author_email='info@teskalabs.com',
 	platforms='any',
 	classifiers=[
+		'Development Status :: 3 - Alpha',
+		'License :: OSI Approved :: Apache Software License',
 		'Programming Language :: Python :: 3.7',
+		'Programming Language :: Python :: 3.8',
+		'Programming Language :: Python :: 3.9',
+		'Programming Language :: Python :: Implementation :: CPython',
 	],
 	packages=[
 		"cysimdjson",
 	],
 	project_urls={
 		"Source": "https://github.com/TeskaLabs/cysimdjson",
+		'Tracker': 'https://github.com/TeskaLabs/cysimdjson/issues',
 	},
 	install_requires=[
 	],

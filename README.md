@@ -44,11 +44,10 @@ The `json_parsed` is a read-only dictionary-like object, that provides an access
 
 ```
 pip3 install cython
-pip3 install git+https://github.com/TeskaLabs/cysimdjson.git
+pip3 install cysimdjson
 ```
 
-_Note: cysimdjson will be released to pypi shortly._
-
+Project `cysimdjson` is distributed via PyPI: https://pypi.org/project/cysimdjson/ .
 
 ## Performance
 
