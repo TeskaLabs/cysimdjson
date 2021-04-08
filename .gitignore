@@ -3,3 +3,5 @@ build
 cysimdjson/cysimdjson.cpp
 cysimdjson.*.so
 __pycache__
+dist/
+cysimdjson.egg-info/
