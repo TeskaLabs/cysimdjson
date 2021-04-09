@@ -3,10 +3,12 @@
 from libc.stdint cimport int64_t, uint64_t, uint32_t
 from libcpp cimport bool
 from libcpp.string cimport string
+
 from cpython.bytes cimport PyBytes_AsStringAndSize
+from cpython.ref cimport PyObject
+
 from cython.operator cimport preincrement
 from cython.operator cimport dereference
-from cpython.ref cimport PyObject
 
 
 cdef extern from "string_view" namespace "std":
@@ -116,8 +118,10 @@ cdef extern from "jsoninter.h":
 
 	cdef object element_to_py_string(simdjson_element & value) except + simdjson_error_handler
 
-	PyObject * string_view_to_python_string(string_view & sv)
-	string get_active_implementation()
+	cdef PyObject * string_view_to_python_string(string_view & sv)
+	cdef string get_active_implementation()
+
+	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
 
 
 cdef class JSONObject:
@@ -237,14 +241,14 @@ cdef class JSONParser:
 		simdjson_parser Parser
 
 
-	def __cinit__(self, max_capacity=None):
+	def __cinit__(JSONParser self, max_capacity=None):
 		if max_capacity is not None:
 			self.Parser = simdjson_parser.simdjson_parser(int(max_capacity))
 		else:
 			self.Parser = simdjson_parser.simdjson_parser()
 
 
-	def parse(self, event):
+	def parse(JSONParser self, event: bytes):
 		cdef Py_ssize_t pysize
 		cdef char * data_ptr
 		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
@@ -255,7 +259,7 @@ cdef class JSONParser:
 		return _wrap_element(element, self, event)
 
 
-	def parse_in_place(self, event):
+	def parse_in_place(JSONParser self, event: bytes):
 		'''
 		Skip the reallocation of the input event buffer.
 		This method is little bit faster than parse() but you have to ensure proper padding of the event.
@@ -270,12 +274,21 @@ cdef class JSONParser:
 		return _wrap_element(element, self, event)
 
 
-	def load(self, path):
+	def parse_string(JSONParser self, event: str):
+
+		cdef Py_ssize_t pysize
+		cdef const char * data_ptr = PyUnicode_AsUTF8AndSize(event, &pysize)
+
+		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
+		return _wrap_element(element, self, event)
+
+
+	def load(JSONParser self, path):
 		cdef simdjson_element element = self.Parser.load(path)
 		return _wrap_element(element, self, None)
 
 
-	def active_implementation(self):
+	def active_implementation(JSONParser self):
 		return get_active_implementation()
 
 

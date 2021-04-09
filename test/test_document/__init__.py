@@ -46,3 +46,12 @@ class JSONDocumentTestCases(unittest.TestCase):
 		parser = cysimdjson.JSONParser()
 		with self.assertRaises(ValueError) as context:
 			json_parsed = parser.parse(b"Definitively not a JSON")
+
+
+
+	def test_string_01(self):
+
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'document.json'), 'r') as fo:
+			json_parsed = parser.parse_string(fo.read())
