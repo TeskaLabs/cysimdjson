@@ -40,6 +40,27 @@ _Note: `parser` object can be reused for maximum performance._
 The `json_parsed` is a read-only dictionary-like object, that provides an access to JSON data.
 
 
+## Documentation
+
+`JSONParser.parse(json_bytes)`
+
+Parse JSON `json_bytes`, represented as `bytes`.
+
+
+`JSONParser.parse_in_place(bytes)`
+
+Parse JSON `json_bytes`, represented as `bytes`, assuming that there is a padding expected by SIMDJSON.
+This is the fastest parsing variant.
+
+
+`JSONParser.parse_string(string)`
+
+Parse JSON `json_bytes`, represented as `str` (string).
+
+
+`JSONParser.load(path)`
+
+
 ## Installation
 
 ```
