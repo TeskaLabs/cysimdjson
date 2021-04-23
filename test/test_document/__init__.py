@@ -1,3 +1,4 @@
+import pprint
 import unittest
 import os
 
@@ -55,3 +56,36 @@ class JSONDocumentTestCases(unittest.TestCase):
 
 		with open(os.path.join(THIS_DIR, 'document.json'), 'r') as fo:
 			json_parsed = parser.parse_string(fo.read())
+
+
+	def test_parser_resut(self):
+
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'document.json'), 'r') as fo:
+			json_parsed = parser.parse_string(fo.read())
+
+		self.assertEqual(
+			json_parsed.export(),
+			{'document': {
+				'key1': 1,
+				'key2': '2',
+				'key3': '3',
+				'key4': 40,
+				'key5': '50',
+			}}
+		)
+
+		with open(os.path.join(THIS_DIR, 'document.json'), 'r') as fo:
+			json_parsed1 = parser.parse_string(fo.read())
+
+		self.assertEqual(
+			json_parsed1.export(),
+			{'document': {
+				'key1': 1,
+				'key2': '2',
+				'key3': '3',
+				'key4': 40,
+				'key5': '50',
+			}}
+		)

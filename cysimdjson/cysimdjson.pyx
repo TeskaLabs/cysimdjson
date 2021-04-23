@@ -61,7 +61,7 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
 
 		cppclass iterator:
 			iterator()
-			
+
 			operator++()
 			bint operator!=(iterator)
 			simdjson_element operator*()
@@ -188,6 +188,14 @@ cdef class JSONObject:
 		return _wrap_element(v, self.Parser, self.Data)
 
 
+	def export(self):
+		'''
+		Export the JSON object to a Python dictionary.
+		WARNING: This is expensive operation.
+		'''
+		return _export_object(self.Object)
+
+
 cdef class JSONArray:
 
 	cdef simdjson_array Array
@@ -233,6 +241,14 @@ cdef class JSONArray:
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Array.at_pointer(key_raw)
 		return _wrap_element(v, self.Parser, self.Data)
+
+
+	def export(self):
+		'''
+		Export the JSON array to a Python list.
+		WARNING: This is expensive operation.
+		'''
+		return _export_array(self.Array)
 
 
 cdef class JSONParser:
@@ -304,6 +320,67 @@ cdef inline object _wrap_element(simdjson_element v, JSONParser parser, event):
 		arr = JSONArray(parser, event)
 		arr.Array = v.get_array()
 		return arr
+
+	elif et == STRING:
+		return element_to_py_string(v)
+
+	elif et == INT64:
+		return v.get_int64()
+
+	elif et == UINT64:
+		return v.get_uint64()
+
+	elif et == DOUBLE:
+		return v.get_double()
+
+	elif et == NULL_VALUE:
+		return None
+
+	elif et == BOOL:
+		return v.get_bool()
+
+	else:
+		raise ValueError("Unknown element type")
+
+
+cdef inline object _export_object(simdjson_object obj):
+	cdef simdjson_object.iterator it_obj
+
+	result = {}
+	it_obj = obj.begin()
+	while it_obj != obj.end():
+		sv = it_obj.key()
+		result[<object>string_view_to_python_string(sv)] = _export_element(it_obj.value())
+		preincrement(it_obj)
+
+	return result
+
+
+cdef inline object _export_array(simdjson_array arr):
+	cdef simdjson_array.iterator it
+
+	it = arr.begin()
+
+	result = []
+	while it != arr.end():
+		result.append(
+			_export_element(
+				dereference(it)
+			)
+		)
+		preincrement(it)
+
+	return result
+
+
+cdef inline object _export_element(simdjson_element v):
+	cdef simdjson_element_type et = v.type()
+
+	if et == OBJECT:
+		return _export_object(v.get_object())
+
+	elif et == ARRAY:
+		return _export_array(v.get_array())
 
 	elif et == STRING:
 		return element_to_py_string(v)
