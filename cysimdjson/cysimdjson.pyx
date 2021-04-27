@@ -115,6 +115,7 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom::element_type":
 cdef extern from "jsoninter.h":
 
 	cdef bool object_contains(simdjson_object & obj, const char * key) except + simdjson_error_handler
+	cdef bool object_get(simdjson_object & obj, const char * key, simdjson_element & value)
 
 	cdef object element_to_py_string(simdjson_element & value) except + simdjson_error_handler
 
@@ -159,11 +160,22 @@ cdef class JSONObject:
 			preincrement(it)
 
 
-	def __getitem__(JSONObject self, key):
+	def __getitem__(JSONObject self, str key):
 		cdef simdjson_element v
 
 		key_raw = key.encode('utf-8')
 		v = self.Object[key_raw]
+
+		return _wrap_element(v, self.Parser, self.Data)
+
+
+	def get(JSONObject self, str key, default=None):
+		cdef simdjson_element v
+
+		key_raw = key.encode('utf-8')
+		cdef bool found = object_get(self.Object, key_raw, v)
+		if not found:
+			return default
 
 		return _wrap_element(v, self.Parser, self.Data)
 

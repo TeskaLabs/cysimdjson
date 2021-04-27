@@ -10,6 +10,13 @@ inline bool object_contains(dom::object & obj, const char * key) {
 }
 
 
+inline bool object_get(dom::object & obj, const char * key, dom::element & value) {
+	simdjson_result<dom::element> ret = obj.at_key(key);
+	error_code error = ret.get(value);
+	return (error == SUCCESS);
+}
+
+
 inline PyObject * string_view_to_python_string(std::string_view & sv) {
 	return PyUnicode_FromStringAndSize(
 		sv.data(),
