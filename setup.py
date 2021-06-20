@@ -1,10 +1,3 @@
-import re
-import os
-import pathlib
-import subprocess
-
-import glob
-
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
 from os import path
@@ -14,7 +7,7 @@ from Cython.Build import cythonize
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+	long_description = f.read()
 
 extensions = [
 	Extension(
@@ -27,7 +20,7 @@ extensions = [
 		language="c++",
 		extra_compile_args=[
 			"-std=c++17",  # for std::string_view class that became standard in C++17
-			"-O3"
+			"-Wno-deprecated",
 		],
 	)
 ]
@@ -47,7 +40,6 @@ setup(
 		'Programming Language :: Python :: 3.7',
 		'Programming Language :: Python :: 3.8',
 		'Programming Language :: Python :: 3.9',
-		'Programming Language :: Python :: Implementation :: CPython',
 	],
 	packages=[
 		"cysimdjson",
