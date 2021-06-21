@@ -1,6 +1,8 @@
 .vscode
 build
 cysimdjson/cysimdjson.cpp
+cysimdjson/cysimdjson.h
+cysimdjson/cysimdjson_api.h
 cysimdjson.*.so
 __pycache__
 dist/

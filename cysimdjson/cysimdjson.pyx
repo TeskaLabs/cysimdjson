@@ -124,6 +124,8 @@ cdef extern from "jsoninter.h":
 
 	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
 
+	cdef simdjson_element extract_element(void *)
+
 
 cdef class JSONObject:
 
@@ -311,6 +313,12 @@ cdef class JSONParser:
 
 	def active_implementation(JSONParser self):
 		return get_active_implementation()
+
+
+# This method is used by C-level callers who want to wrap `simdjson::dom::element` into a cysimdjson object instance
+cdef public api object cysimdjson_wrap_element(void * element):
+	cdef simdjson_element v = extract_element(element)
+	return _wrap_element(v)
 
 
 cdef inline object _wrap_element(simdjson_element v):
