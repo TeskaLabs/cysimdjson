@@ -11,7 +11,7 @@ from cython.operator cimport preincrement
 from cython.operator cimport dereference
 
 
-cdef extern from "string_view" namespace "std":
+cdef extern from "<string_view>" namespace "std":
 	cppclass string_view:
 		pass
 
@@ -128,13 +128,10 @@ cdef extern from "jsoninter.h":
 cdef class JSONObject:
 
 	cdef simdjson_object Object
-	cdef readonly JSONParser Parser
-	cdef object Data
 
 
-	def __cinit__(JSONObject self, JSONParser parser, data):
-		self.Parser = parser
-		self.Data = data
+	def __cinit__(JSONObject self):
+		pass
 
 
 	def __contains__(JSONObject self, key):
@@ -156,7 +153,7 @@ cdef class JSONObject:
 			sv = it.key()
 			v = it.value()
 
-			yield <object> string_view_to_python_string(sv), _wrap_element(v, self.Parser, self.Data)
+			yield <object> string_view_to_python_string(sv), _wrap_element(v)
 			preincrement(it)
 
 
@@ -166,7 +163,7 @@ cdef class JSONObject:
 		key_raw = key.encode('utf-8')
 		v = self.Object[key_raw]
 
-		return _wrap_element(v, self.Parser, self.Data)
+		return _wrap_element(v)
 
 
 	def get(JSONObject self, str key, default=None):
@@ -177,7 +174,7 @@ cdef class JSONObject:
 		if not found:
 			return default
 
-		return _wrap_element(v, self.Parser, self.Data)
+		return _wrap_element(v)
 
 
 	def __len__(JSONObject self):
@@ -197,7 +194,7 @@ cdef class JSONObject:
 	def at_pointer(JSONObject self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Object.at_pointer(key_raw)
-		return _wrap_element(v, self.Parser, self.Data)
+		return _wrap_element(v)
 
 
 	def export(self):
@@ -211,13 +208,9 @@ cdef class JSONObject:
 cdef class JSONArray:
 
 	cdef simdjson_array Array
-	cdef readonly JSONParser Parser
-	cdef object Data
 
-	def __cinit__(JSONArray self, JSONParser parser, data):
-		self.Parser = parser
-		self.Data = data
-
+	def __cinit__(JSONArray self):
+		pass
 
 	def __contains__(JSONArray self, item):
 		# This is a full scan
@@ -229,7 +222,7 @@ cdef class JSONArray:
 
 	def __getitem__(JSONArray self, key: int):
 		cdef simdjson_element v = self.Array.at(key)
-		return _wrap_element(v, self.Parser, self.Data)
+		return _wrap_element(v)
 
 
 	def __len__(JSONArray self):
@@ -245,14 +238,14 @@ cdef class JSONArray:
 
 		while it != it_end:
 			element = dereference(it)
-			yield _wrap_element(element, self.Parser, self.Data)
+			yield _wrap_element(element)
 			preincrement(it)
 
 
 	def at_pointer(JSONArray self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Array.at_pointer(key_raw)
-		return _wrap_element(v, self.Parser, self.Data)
+		return _wrap_element(v)
 
 
 	def export(self):
@@ -284,7 +277,7 @@ cdef class JSONParser:
 			raise RuntimeError("Failed to get raw data")
 
 		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
-		return _wrap_element(element, self, event)
+		return _wrap_element(element)
 
 
 	def parse_in_place(JSONParser self, event: bytes):
@@ -299,7 +292,7 @@ cdef class JSONParser:
 			raise RuntimeError("Failed to get raw data")
 
 		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 0)
-		return _wrap_element(element, self, event)
+		return _wrap_element(element)
 
 
 	def parse_string(JSONParser self, event: str):
@@ -308,28 +301,28 @@ cdef class JSONParser:
 		cdef const char * data_ptr = PyUnicode_AsUTF8AndSize(event, &pysize)
 
 		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
-		return _wrap_element(element, self, event)
+		return _wrap_element(element)
 
 
 	def load(JSONParser self, path):
 		cdef simdjson_element element = self.Parser.load(path)
-		return _wrap_element(element, self, None)
+		return _wrap_element(element)
 
 
 	def active_implementation(JSONParser self):
 		return get_active_implementation()
 
 
-cdef inline object _wrap_element(simdjson_element v, JSONParser parser, event):
+cdef inline object _wrap_element(simdjson_element v):
 	cdef simdjson_element_type et = v.type()
 
 	if et == OBJECT:
-		obj = JSONObject(parser, event)
+		obj = JSONObject()
 		obj.Object = v.get_object()
 		return obj
 
 	elif et == ARRAY:
-		arr = JSONArray(parser, event)
+		arr = JSONArray()
 		arr.Array = v.get_array()
 		return arr
 
