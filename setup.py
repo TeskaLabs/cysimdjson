@@ -12,10 +12,11 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 extensions = [
 	Extension(
 		"cysimdjson",
-		[
+		[			
 			'cysimdjson/cysimdjson.pyx',
 			'cysimdjson/simdjson/simdjson.cpp',
 			'cysimdjson/pysimdjson/errors.cpp',
+			'cysimdjson/cysimdjsonc.cpp',
 		],
 		language="c++",
 		extra_compile_args=[

@@ -34,3 +34,9 @@ inline PyObject * element_to_py_string(dom::element & value) {
 inline std::string get_active_implementation() {
 	return simdjson::active_implementation->description();
 }
+
+
+inline dom::element extract_element(void * p) {
+	dom::element * element = static_cast<dom::element *>(p);
+	return *element;
+}
