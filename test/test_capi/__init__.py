@@ -22,7 +22,7 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 
 	def test_capi_02(self):
 		self.cysimdjsonapi.cysimdjson_parser_new.restype = ctypes.c_int
-		element_sizeof = ctypes.pythonapi.cysimdjson_element_sizeof()
+		element_sizeof = self.cysimdjsonapi.cysimdjson_element_sizeof()
 		print("element_sizeof:", element_sizeof)
 
 
