@@ -60,7 +60,7 @@ bool cysimdjson_parser_parse(void * p, void * memory, const uint8_t * data, size
 }
 
 
-bool cysimdjson_element_get_str(const char * attrname, size_t attrlen, void * e, const char ** output, size_t * outputlen) {
+bool cysimdjson_element_get_str(const char * attrname, size_t attrlen, void * e, char ** output, size_t * outputlen) {
 	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
 	std::string_view pointer = std::string_view(attrname, attrlen);
 
@@ -70,11 +70,90 @@ bool cysimdjson_element_get_str(const char * attrname, size_t attrlen, void * e,
 		return true;
 	}
 
-	*output = result.data();
+	*output = (char *)result.data();
 	*outputlen = result.size();
 	return false;
 }
 
+bool cysimdjson_element_get_int64_t(const char * attrname, size_t attrlen, void * e, int64_t * output) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
+
+	int64_t result;
+	auto err = element->at_pointer(pointer).get(result);
+	if (err) {
+		return true;
+	}
+
+	*output = result;
+	return false;
+}
+
+bool cysimdjson_element_get_uint64_t(const char * attrname, size_t attrlen, void * e, uint64_t * output) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
+
+	uint64_t result;
+	auto err = element->at_pointer(pointer).get(result);
+	if (err) {
+		return true;
+	}
+
+	*output = result;
+	return false;
+}
+
+bool cysimdjson_element_get_bool(const char * attrname, size_t attrlen, void * e, bool * output) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
+
+	bool result;
+	auto err = element->at_pointer(pointer).get(result);
+	if (err) {
+		return true;
+	}
+
+	*output = result;
+	return false;
+}
+
+bool cysimdjson_element_get_double(const char * attrname, size_t attrlen, void * e, double * output) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
+
+	double result;
+	auto err = element->at_pointer(pointer).get(result);
+	if (err) {
+		return true;
+	}
+
+	*output = result;
+	return false;
+}
+
+char cysimdjson_element_get_type(const char * attrname, size_t attrlen, void * e) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
+
+	simdjson::dom::element_type result;
+	auto err = element->at_pointer(pointer).type().get(result);
+	if (err) {
+		return '\0';
+	}
+
+	switch (result) {
+		case simdjson::dom::element_type::INT64: return 'i';
+		case simdjson::dom::element_type::UINT64: return 'u';
+		case simdjson::dom::element_type::STRING: return 's';
+		case simdjson::dom::element_type::DOUBLE: return 'f';
+		case simdjson::dom::element_type::BOOL: return 'B';
+		case simdjson::dom::element_type::ARRAY: return 'A';
+		case simdjson::dom::element_type::OBJECT: return 'O';
+		case simdjson::dom::element_type::NULL_VALUE: return 'N';
+	}
+
+	return '\0';
+}
 
 // This is here for an unit test
 void cysimdjson_parser_test() {
