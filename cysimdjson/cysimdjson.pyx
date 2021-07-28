@@ -90,6 +90,8 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
 		simdjson_array get_array() except +simdjson_error_handler
 		simdjson_object get_object() except +simdjson_error_handler
 
+		simdjson_element at_pointer(const char*) except +simdjson_error_handler
+
 
 	cdef cppclass simdjson_parser "simdjson::dom::parser":
 
@@ -125,15 +127,14 @@ cdef extern from "jsoninter.h":
 	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
 
 	cdef simdjson_element extract_element(void *)
+	cdef size_t element_addrof(simdjson_element & value)
 
 
 cdef class JSONObject:
 
-	cdef simdjson_object Object
-
-
-	def __cinit__(JSONObject self):
-		pass
+	cdef:
+		simdjson_element Element
+		simdjson_object Object
 
 
 	def __contains__(JSONObject self, key):
@@ -155,7 +156,8 @@ cdef class JSONObject:
 			sv = it.key()
 			v = it.value()
 
-			yield <object> string_view_to_python_string(sv), _wrap_element(v)
+			elem = JSONElement.from_element(v)
+			yield <object> string_view_to_python_string(sv), elem.get_value()
 			preincrement(it)
 
 
@@ -165,7 +167,7 @@ cdef class JSONObject:
 		key_raw = key.encode('utf-8')
 		v = self.Object[key_raw]
 
-		return _wrap_element(v)
+		return JSONElement.from_element(v).get_value()
 
 
 	def get(JSONObject self, str key, default=None):
@@ -175,9 +177,8 @@ cdef class JSONObject:
 		cdef bool found = object_get(self.Object, key_raw, v)
 		if not found:
 			return default
-
-		return _wrap_element(v)
-
+		return JSONElement.from_element(v).get_value()
+	
 
 	def __len__(JSONObject self):
 		return self.Object.size()
@@ -196,7 +197,14 @@ cdef class JSONObject:
 	def at_pointer(JSONObject self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Object.at_pointer(key_raw)
-		return _wrap_element(v)
+		return JSONElement.from_element(v).get_value()
+
+
+	def get_value(JSONElement self):
+		'''
+		Get the python value
+		'''
+		return self
 
 
 	def export(self):
@@ -207,12 +215,16 @@ cdef class JSONObject:
 		return _export_object(self.Object)
 
 
+	def get_addr(JSONElement self):
+		return element_addrof(self.Element)
+
+
 cdef class JSONArray:
 
-	cdef simdjson_array Array
+	cdef:
+		simdjson_element Element
+		simdjson_array Array
 
-	def __cinit__(JSONArray self):
-		pass
 
 	def __contains__(JSONArray self, item):
 		# This is a full scan
@@ -224,7 +236,8 @@ cdef class JSONArray:
 
 	def __getitem__(JSONArray self, key: int):
 		cdef simdjson_element v = self.Array.at(key)
-		return _wrap_element(v)
+
+		return JSONElement.from_element(v).get_value()
 
 
 	def __len__(JSONArray self):
@@ -239,15 +252,22 @@ cdef class JSONArray:
 		cdef simdjson_element element
 
 		while it != it_end:
-			element = dereference(it)
-			yield _wrap_element(element)
+			elem = JSONElement.from_element(dereference(it))
+			yield elem.get_value()
 			preincrement(it)
 
 
 	def at_pointer(JSONArray self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Array.at_pointer(key_raw)
-		return _wrap_element(v)
+		return JSONElement.from_element(v).get_value()
+
+
+	def get_value(JSONElement self):
+		'''
+		Get the python value
+		'''
+		return self
 
 
 	def export(self):
@@ -258,132 +278,57 @@ cdef class JSONArray:
 		return _export_array(self.Array)
 
 
-cdef class JSONParser:
+	def get_addr(JSONElement self):
+		return element_addrof(self.Element)
+
+
+cdef class JSONElement:
 
 	cdef:
-		simdjson_parser Parser
+		simdjson_element Element
 
+	@staticmethod
+	cdef inline from_element(simdjson_element element):
+		'''
+		This is the correct factory method
+		'''
+		cdef simdjson_element_type et = element.type()
 
-	def __cinit__(JSONParser self, max_capacity=None):
-		if max_capacity is not None:
-			self.Parser = simdjson_parser.simdjson_parser(int(max_capacity))
+		if et == OBJECT:
+			new_object = JSONObject()
+			new_object.Element = element
+			new_object.Object = element.get_object()
+			return new_object
+
+		elif et == ARRAY:
+			new_array = JSONArray()
+			new_array.Element = element
+			new_array.Array = element.get_array()
+			return new_array
+
 		else:
-			self.Parser = simdjson_parser.simdjson_parser()
+			new_element = JSONElement()
+			new_element.Element = element
+			return new_element
 
 
-	def parse(JSONParser self, event: bytes):
-		cdef Py_ssize_t pysize
-		cdef char * data_ptr
-		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
-		if rc == -1:
-			raise RuntimeError("Failed to get raw data")
 
-		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
-		return _wrap_element(element)
+	def at_pointer(JSONElement self, key: str):
+		key_raw = key.encode('utf-8')
+		cdef simdjson_element v = self.Element.at_pointer(key_raw)
+		return JSONElement.from_element(v)
 
 
-	def parse_in_place(JSONParser self, event: bytes):
-		'''
-		Skip the reallocation of the input event buffer.
-		This method is little bit faster than parse() but you have to ensure proper padding of the event.
-		'''
-		cdef Py_ssize_t pysize
-		cdef char * data_ptr
-		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
-		if rc == -1:
-			raise RuntimeError("Failed to get raw data")
-
-		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 0)
-		return _wrap_element(element)
+	def get_value(JSONElement self):
+		return _get_element(self.Element)
 
 
-	def parse_string(JSONParser self, event: str):
-
-		cdef Py_ssize_t pysize
-		cdef const char * data_ptr = PyUnicode_AsUTF8AndSize(event, &pysize)
-
-		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
-		return _wrap_element(element)
+	def export(JSONElement self):
+		return _export_element(self.Element)
 
 
-	def load(JSONParser self, path):
-		cdef simdjson_element element = self.Parser.load(path)
-		return _wrap_element(element)
-
-
-	def active_implementation(JSONParser self):
-		return get_active_implementation()
-
-
-# This method is used by C-level callers who want to wrap `simdjson::dom::element` into a cysimdjson object instance
-cdef public api object cysimdjson_wrap_element(void * element):
-	cdef simdjson_element v = extract_element(element)
-	return _wrap_element(v)
-
-
-cdef inline object _wrap_element(simdjson_element v):
-	cdef simdjson_element_type et = v.type()
-
-	if et == OBJECT:
-		obj = JSONObject()
-		obj.Object = v.get_object()
-		return obj
-
-	elif et == ARRAY:
-		arr = JSONArray()
-		arr.Array = v.get_array()
-		return arr
-
-	elif et == STRING:
-		return element_to_py_string(v)
-
-	elif et == INT64:
-		return v.get_int64()
-
-	elif et == UINT64:
-		return v.get_uint64()
-
-	elif et == DOUBLE:
-		return v.get_double()
-
-	elif et == NULL_VALUE:
-		return None
-
-	elif et == BOOL:
-		return v.get_bool()
-
-	else:
-		raise ValueError("Unknown element type")
-
-
-cdef inline object _export_object(simdjson_object obj):
-	cdef simdjson_object.iterator it_obj
-
-	result = {}
-	it_obj = obj.begin()
-	while it_obj != obj.end():
-		sv = it_obj.key()
-		result[<object>string_view_to_python_string(sv)] = _export_element(it_obj.value())
-		preincrement(it_obj)
-
-	return result
-
-
-cdef inline object _export_array(simdjson_array arr):
-	cdef simdjson_array.iterator it
-
-	it = arr.begin()
-
-	result = []
-	while it != arr.end():
-		result.append(
-			_export_element(
-				dereference(it)
-			)
-		)
-		preincrement(it)
-
-	return result
+	def get_addr(JSONElement self):
+		return element_addrof(self.Element)
 
 
 cdef inline object _export_element(simdjson_element v):
@@ -415,6 +360,138 @@ cdef inline object _export_element(simdjson_element v):
 
 	else:
 		raise ValueError("Unknown element type")
+
+
+cdef inline object _get_element(simdjson_element v):
+	cdef simdjson_element_type et = v.type()
+
+	if et == STRING:
+		return element_to_py_string(v)
+
+	elif et == INT64:
+		return v.get_int64()
+
+	elif et == UINT64:
+		return v.get_uint64()
+
+	elif et == DOUBLE:
+		return v.get_double()
+
+	elif et == NULL_VALUE:
+		return None
+
+	elif et == BOOL:
+		return v.get_bool()
+
+	elif et == OBJECT:
+		return _export_object(v.get_object())
+
+	elif et == ARRAY:
+		return _export_array(v.get_array())
+
+	else:
+		raise ValueError("Unknown element type")
+
+
+cdef class JSONParser:
+
+	cdef:
+		simdjson_parser Parser
+
+
+	def __cinit__(JSONParser self, max_capacity=None):
+		if max_capacity is not None:
+			self.Parser = simdjson_parser.simdjson_parser(int(max_capacity))
+		else:
+			self.Parser = simdjson_parser.simdjson_parser()
+
+
+	def parse(JSONParser self, event: bytes):
+		cdef Py_ssize_t pysize
+		cdef char * data_ptr
+		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
+		if rc == -1:
+			raise RuntimeError("Failed to get raw data")
+
+		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
+		return JSONElement.from_element(element)
+
+
+	def parse_in_place(JSONParser self, event: bytes):
+		'''
+		Skip the reallocation of the input event buffer.
+		This method is little bit faster than parse() but you have to ensure proper padding of the event.
+		'''
+		cdef Py_ssize_t pysize
+		cdef char * data_ptr
+		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
+		if rc == -1:
+			raise RuntimeError("Failed to get raw data")
+
+		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 0)
+		return JSONElement.from_element(element)
+
+
+	def parse_string(JSONParser self, event: str):
+
+		cdef Py_ssize_t pysize
+		cdef const char * data_ptr = PyUnicode_AsUTF8AndSize(event, &pysize)
+
+		cdef simdjson_element element = self.Parser.parse(data_ptr, pysize, 1)
+		return JSONElement.from_element(element)
+
+
+	def load(JSONParser self, path: str):
+		'''
+		This is a Pythonic API, as close to `json.load()` as possible/practical.
+		This means that the result of the load() is not the element but final value.
+		'''
+		path_bytes = path.encode('utf-8')
+		cdef simdjson_element element = self.Parser.load(path_bytes)
+		return JSONElement.from_element(element).get_value()
+
+
+	def active_implementation(JSONParser self):
+		return get_active_implementation()
+
+
+cdef public api object cysimdjson_wrap_element(void * element):
+	'''
+	Used by C-level callers who want to wrap `simdjson::dom::element`
+	into a cysimdjson JSONElement instance.
+	'''
+	cdef simdjson_element v = extract_element(element)
+	return JSONElement.from_element(v)
+
+
+cdef inline object _export_object(simdjson_object obj):
+	cdef simdjson_object.iterator it_obj
+
+	result = {}
+	it_obj = obj.begin()
+	while it_obj != obj.end():
+		sv = it_obj.key()
+		result[<object>string_view_to_python_string(sv)] = _export_element(it_obj.value())
+		preincrement(it_obj)
+
+	return result
+
+
+cdef inline object _export_array(simdjson_array arr):
+	cdef simdjson_array.iterator it
+
+	it = arr.begin()
+
+	result = []
+	while it != arr.end():
+		result.append(
+			_export_element(
+				dereference(it)
+			)
+		)
+		preincrement(it)
+
+	return result
 
 
 MAXSIZE_BYTES = SIMDJSON_MAXSIZE_BYTES

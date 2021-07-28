@@ -91,7 +91,7 @@ class JSONDocumentTestCases(unittest.TestCase):
 		)
 
 
-	def test_gey_01(self):
+	def test_get_01(self):
 
 		parser = cysimdjson.JSONParser()
 
