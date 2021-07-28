@@ -115,3 +115,13 @@ class JSONDocumentTestCases(unittest.TestCase):
 
 		v3 = json_parsed.get('not-present')
 		self.assertEqual(v3, None)
+
+
+	def test_loads_01(self):
+
+		parser = cysimdjson.JSONParser()
+		json_parsed = parser.loads('''{"foo":"bar"}''')
+
+		self.assertEqual(json_parsed['foo'], 'bar')
+
+

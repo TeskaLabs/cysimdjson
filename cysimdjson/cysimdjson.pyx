@@ -451,6 +451,16 @@ cdef class JSONParser:
 		return JSONElement.from_element(element).get_value()
 
 
+	def loads(JSONParser self, content: str):
+		'''
+		This is a Pythonic API, as close to `jsons.load()` as possible/practical.
+		This means that the result of the loads() is not the element but final value.
+		'''
+		path_bytes = content.encode('utf-8')
+		cdef simdjson_element element = self.Parser.parse(path_bytes, len(path_bytes), 1)
+		return JSONElement.from_element(element).get_value()
+
+
 	def active_implementation(JSONParser self):
 		return get_active_implementation()
 
