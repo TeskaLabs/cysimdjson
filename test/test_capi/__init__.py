@@ -76,7 +76,6 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 		self.cysimdjsonapi.cysimdjson_parser_del(parser)
 
 
-
 	def test_capi_05(self):
 		parser = self.cysimdjsonapi.cysimdjson_parser_new()
 
@@ -125,3 +124,32 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 
 
 		self.cysimdjsonapi.cysimdjson_parser_del(parser)
+
+
+	def test_capi_06(self):
+
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'test.json'), 'r') as fo:
+			json_parsed = parser.parse_string(fo.read())
+
+		# Transition into C API
+		element_addr = json_parsed.get_addr()
+		self.assertNotEqual(element_addr, 0)
+
+		jsonpointer = ctypes.create_string_buffer(b"/document/key4")
+		int64_ptr = ctypes.c_int64()
+
+		error = self.cysimdjsonapi.cysimdjson_element_get_int64_t(
+			jsonpointer,
+			len(jsonpointer) - 1,  # We don't want terminating '\0'
+			element_addr,
+			int64_ptr
+		)
+		self.assertFalse(error)
+		self.assertEqual(int64_ptr.value, 40)
+
+		# Transition back to Cython API
+		cython_element = cysimdjson.addr_to_element(element_addr)
+		val = cython_element.at_pointer("/document/key4")
+		self.assertEqual(val, 40)

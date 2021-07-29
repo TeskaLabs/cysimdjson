@@ -465,12 +465,19 @@ cdef class JSONParser:
 		return get_active_implementation()
 
 
-cdef public api object cysimdjson_wrap_element(void * element):
+cdef public api object cysimdjson_addr_to_element(void * element):
 	'''
 	Used by C-level callers who want to wrap `simdjson::dom::element`
 	into a cysimdjson JSONElement instance.
 	'''
 	cdef simdjson_element v = extract_element(element)
+	return JSONElement.from_element(v)
+
+
+def addr_to_element(element_addr: int):
+	cdef char * e = NULL
+	e += <size_t>element_addr
+	cdef simdjson_element v = extract_element(e)
 	return JSONElement.from_element(v)
 
 
