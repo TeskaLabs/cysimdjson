@@ -22,7 +22,7 @@ void cysimdjson_parser_del(void * p) {
 }
 
 
-size_t cysimdjson_element_sizeof(void) {
+const size_t cysimdjson_element_sizeof(void) {
 	return sizeof(simdjson::dom::element);
 }
 

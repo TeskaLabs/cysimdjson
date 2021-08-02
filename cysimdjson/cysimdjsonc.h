@@ -11,7 +11,7 @@
 void * cysimdjson_parser_new(void);
 void cysimdjson_parser_del(void * parser);
 
-size_t cysimdjson_element_sizeof(void);
+const size_t cysimdjson_element_sizeof(void);
 
 // `element` is a pointer with pre-allocated buffer of the size=cysimdjson_element_sizeof()
 bool cysimdjson_parser_parse(void * parser, void * element, const uint8_t * data, size_t datalen);
