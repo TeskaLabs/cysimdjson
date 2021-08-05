@@ -22,7 +22,7 @@ void cysimdjson_parser_del(void * p) {
 }
 
 
-size_t cysimdjson_element_sizeof(void) {
+const size_t cysimdjson_element_sizeof(void) {
 	return sizeof(simdjson::dom::element);
 }
 
@@ -76,6 +76,7 @@ bool cysimdjson_element_get_str(const char * attrname, size_t attrlen, void * e,
 }
 
 bool cysimdjson_element_get_int64_t(const char * attrname, size_t attrlen, void * e, int64_t * output) {
+
 	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
 	std::string_view pointer = std::string_view(attrname, attrlen);
 
@@ -155,10 +156,23 @@ char cysimdjson_element_get_type(const char * attrname, size_t attrlen, void * e
 	return '\0';
 }
 
-// This is here for an unit test
-void cysimdjson_parser_test() {
-	printf("cysimdjson_parser_test started ...\n");
+bool cysimdjson_element_get(const char * attrname, size_t attrlen, void * e, void * output_element) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string_view pointer = std::string_view(attrname, attrlen);
 
+	simdjson::dom::element * sub_element = new(output_element) simdjson::dom::element();
+
+	auto err = element->at_pointer(pointer).get(*sub_element);
+	if (err) {
+		return true;
+	}
+
+	return false;
+
+}
+
+// This is here for an unit test
+int cysimdjson_parser_test() {
 	simdjson::dom::parser parser;
 	simdjson::dom::object object;
 
@@ -166,6 +180,9 @@ void cysimdjson_parser_test() {
 	const size_t jsond_len = std::strlen(jsond);
 
 	auto error = parser.parse(jsond, jsond_len).get(object);
-
-	printf("cysimdjson_parser_test OK!\n");
+	if (error) {
+		return -1;
+	}
+	
+	return 0;
 }

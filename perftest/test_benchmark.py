@@ -3,6 +3,7 @@ import pathlib
 
 jsonpath = pathlib.Path(__file__).parent / "jsonexamples"
 
+
 def benchmark(name, what, number):
 	dt = timeit.timeit(what, number=number)
 	return (name, number, dt)
@@ -30,17 +31,17 @@ def print_results(jsonfile, results):
 	print("")
 
 
-def perftest_orjson_parser(jsonfile, number):
-	import orjson
+# def perftest_orjson_parser(jsonfile, number):
+# 	import orjson
 
-	with open(jsonfile, 'rb') as f:
-		jsonb = f.read()
+# 	with open(jsonfile, 'rb') as f:
+# 		jsonb = f.read()
 
-	return benchmark(
-		"orjson loads",
-		lambda: orjson.loads(jsonb),
-		number=number
-	)
+# 	return benchmark(
+# 		"orjson loads",
+# 		lambda: orjson.loads(jsonb),
+# 		number=number
+# 	)
 
 
 def perftest_pysimdjson_parser(jsonfile, number):
@@ -58,17 +59,17 @@ def perftest_pysimdjson_parser(jsonfile, number):
 	)
 
 
-def perftest_libpy_simdjson_parser(jsonfile, number):
-	import libpy_simdjson
+# def perftest_libpy_simdjson_parser(jsonfile, number):
+# 	import libpy_simdjson
 
-	with open(jsonfile, 'rb') as f:
-		jsonb = f.read()
+# 	with open(jsonfile, 'rb') as f:
+# 		jsonb = f.read()
 
-	return benchmark(
-		"libpy_simdjson loads",
-		lambda: libpy_simdjson.loads(jsonb),
-		number=number
-	)
+# 	return benchmark(
+# 		"libpy_simdjson loads",
+# 		lambda: libpy_simdjson.loads(jsonb),
+# 		number=number
+# 	)
 
 
 def perftest_pythonjson_loads(jsonfile, number):
@@ -113,9 +114,10 @@ def perftest_cysimdjson_pad_parse(jsonfile, number):
 		number=number
 	)
 
+
 def main():
 	test_set = [
-		perftest_orjson_parser,
+	#	perftest_orjson_parser,
 		perftest_pysimdjson_parser,
 	#	perftest_libpy_simdjson_parser,
 		perftest_pythonjson_loads,

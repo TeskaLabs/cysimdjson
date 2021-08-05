@@ -11,17 +11,20 @@
 void * cysimdjson_parser_new(void);
 void cysimdjson_parser_del(void * parser);
 
-size_t cysimdjson_element_sizeof(void);
-bool cysimdjson_parser_parse(void * parser, void * memory, const uint8_t * data, size_t datalen);
+const size_t cysimdjson_element_sizeof(void);
+
+// `element` is a pointer with pre-allocated buffer of the size=cysimdjson_element_sizeof()
+bool cysimdjson_parser_parse(void * parser, void * element, const uint8_t * data, size_t datalen);
 
 bool cysimdjson_element_get_str(const char * attrname, size_t attrlen, void * element, char ** output, size_t * outputlen);
-bool cysimdjson_element_get_int64_t(const char * attrname, size_t attrlen, void * e, int64_t * output);
-bool cysimdjson_element_get_uint64_t(const char * attrname, size_t attrlen, void * e, uint64_t * output);
-bool cysimdjson_element_get_bool(const char * attrname, size_t attrlen, void * e, bool * output);
-bool cysimdjson_element_get_double(const char * attrname, size_t attrlen, void * e, double * output);
+bool cysimdjson_element_get_int64_t(const char * attrname, size_t attrlen, void * element, int64_t * output);
+bool cysimdjson_element_get_uint64_t(const char * attrname, size_t attrlen, void * element, uint64_t * output);
+bool cysimdjson_element_get_bool(const char * attrname, size_t attrlen, void * element, bool * output);
+bool cysimdjson_element_get_double(const char * attrname, size_t attrlen, void * element, double * output);
 
-char cysimdjson_element_get_type(const char * attrname, size_t attrlen, void * e);
+char cysimdjson_element_get_type(const char * attrname, size_t attrlen, void * element);
+bool cysimdjson_element_get(const char * attrname, size_t attrlen, void * element, void * output_element);
 
-void cysimdjson_parser_test(void);
+int cysimdjson_parser_test(void);
 
 #endif

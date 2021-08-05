@@ -40,3 +40,7 @@ inline dom::element extract_element(void * p) {
 	dom::element * element = static_cast<dom::element *>(p);
 	return *element;
 }
+
+inline size_t element_addrof(dom::element & element) {
+	return (size_t)&element;
+}
