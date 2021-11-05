@@ -36,7 +36,7 @@ setup(
 	author_email='info@teskalabs.com',
 	platforms='any',
 	classifiers=[
-		'Development Status :: 3 - Beta',
+		'Development Status :: 4 - Beta',
 		'License :: OSI Approved :: Apache Software License',
 		'Programming Language :: Python :: 3.7',
 		'Programming Language :: Python :: 3.8',
@@ -45,6 +45,7 @@ setup(
 	packages=[
 		"cysimdjson",
 	],
+	url = 'https://github.com/TeskaLabs/cysimdjson',
 	project_urls={
 		"Source": "https://github.com/TeskaLabs/cysimdjson",
 		'Tracker': 'https://github.com/TeskaLabs/cysimdjson/issues',
