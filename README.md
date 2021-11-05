@@ -72,11 +72,13 @@ Parse JSON `json_bytes`, represented as `str` (string).
 ## Installation
 
 ```
-pip3 install cython
 pip3 install cysimdjson
 ```
 
 Project `cysimdjson` is distributed via PyPI: https://pypi.org/project/cysimdjson/ .
+
+If you want to install `cysimdjson` from source, you need to install Cython first: `pip3 install cython`.
+
 
 ## Performance
 
