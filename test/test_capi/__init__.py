@@ -2,7 +2,7 @@ import os
 import ctypes
 import unittest
 
-import cysimdjson
+import cysimdjson.cysimdjson
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,7 +11,7 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 
 
 	def setUp(self):
-		self.cysimdjsonapi = ctypes.cdll.LoadLibrary(cysimdjson.__file__)
+		self.cysimdjsonapi = ctypes.cdll.LoadLibrary(cysimdjson.cysimdjson.__file__)
 
 		self.cysimdjsonapi.cysimdjson_parser_new.restype = ctypes.c_void_p
 		
