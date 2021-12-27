@@ -1,5 +1,4 @@
 from setuptools import setup, Extension
-from setuptools.command.build_py import build_py
 from os import path
 
 from Cython.Build import cythonize
@@ -11,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 extensions = [
 	Extension(
-		"cysimdjson",
+		"cysimdjson.cysimdjson",
 		[			
 			'cysimdjson/cysimdjson.pyx',
 			'cysimdjson/simdjson/simdjson.cpp',

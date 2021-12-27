@@ -3,7 +3,7 @@ build
 cysimdjson/cysimdjson.cpp
 cysimdjson/cysimdjson.h
 cysimdjson/cysimdjson_api.h
-cysimdjson.*.so
+cysimdjson/*.so
 __pycache__
 dist/
 cysimdjson.egg-info/
