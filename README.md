@@ -48,6 +48,17 @@ print(json_parsed.json_parsed['foo'])
 The `json_parsed` is a read-only dictionary-like object, that provides an access to JSON data.
 
 
+## Trade-offs
+
+The speed of `cysimdjson` is based on these assumptions:
+
+1) The output of the parser is read-only, you cannot modify it
+2) The output of the parser is not Python dictionary, but lazily evaluated dictionary-like object
+3) If you convert the parser output into a Python dictionary, you will lose the speed
+
+If your design is not aligned with these assumptions, `cysimdjson` is not a good choice.
+
+
 ## Documentation
 
 `JSONParser.parse(json_bytes)`
