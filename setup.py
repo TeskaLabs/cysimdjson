@@ -53,5 +53,18 @@ setup(
 	},
 	install_requires=[
 	],
+	setup_requires=[
+		"cython"
+	],
+	package_data={
+		"cysimdjson": [
+			"cysimdjson.pyx",
+			"cysimdjson.h",
+			"cysimdjsonc.h",
+			"jsoninter.h",
+			"pysimdjson/errors.h",
+			"simdjson/simdjson.h",
+		]
+	},
 	ext_modules=cythonize(extensions),
 )
