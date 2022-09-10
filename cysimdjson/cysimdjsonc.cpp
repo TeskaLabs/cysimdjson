@@ -153,7 +153,7 @@ char cysimdjson_element_get_type(const char * attrname, size_t attrlen, void * e
 		case simdjson::dom::element_type::NULL_VALUE: return 'N';
 	}
 
-	return '\0';
+	return '?';
 }
 
 bool cysimdjson_element_get(const char * attrname, size_t attrlen, void * e, void * output_element) {
