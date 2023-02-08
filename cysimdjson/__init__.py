@@ -4,10 +4,14 @@ import sys
 # If the environment variable CYSIMDJSON_GLOBAL_DL is set to "1"
 # then the compiled cysimdjson library is imported into a global symbol table
 # It is needed to enable third party component to access cysimdjson C API
-prev = sys.getdlopenflags()
+
+if sys.platform != 'win32':
+	prev = sys.getdlopenflags()
+
 try:
 	if os.environ.get("CYSIMDJSON_GLOBAL_DL") == "1":
-		sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
+		if sys.platform != 'win32':
+			sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
 
 	from .cysimdjson import (
 		JSONParser,
@@ -20,7 +24,8 @@ try:
 		PADDING,
 	)
 finally:
-	sys.setdlopenflags(prev)
+	if sys.platform != 'win32':
+		sys.setdlopenflags(prev)
 
 __all__ = [
 	"JSONParser",
