@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 from os import path
 
 from Cython.Build import cythonize
-
+import sys 
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -21,7 +21,8 @@ extensions = [
 		extra_compile_args=[
 			"-std=c++17",  # for std::string_view class that became standard in C++17
 			"-Wno-deprecated",
-		],
+		# NOTE Windows doesn't know how to handle "-Wno-deprecated"		
+		] if sys.platform != "win32" else ["-std=c++17"],
 	)
 ]
 
