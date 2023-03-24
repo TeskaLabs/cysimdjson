@@ -22,7 +22,7 @@ extensions = [
 			"-std=c++17",  # for std::string_view class that became standard in C++17
 			"-Wno-deprecated",
 		# NOTE Windows doesn't know how to handle "-Wno-deprecated"		
-		] if sys.platform != "win32" else ["/std=c++17"],
+		] if sys.platform != "win32" else ["/std:c++17"],
 	)
 ]
 
