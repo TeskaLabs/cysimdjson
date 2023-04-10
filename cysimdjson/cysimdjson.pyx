@@ -1,11 +1,10 @@
 # cython: language_level=3
 
-from libc.stdint cimport int64_t, uint64_t, uint32_t
+from libc.stdint cimport int64_t, uint64_t
 from libcpp cimport bool
 from libcpp.string cimport string
 
 from cpython.bytes cimport PyBytes_AsStringAndSize
-from cpython.ref cimport PyObject
 
 from cython.operator cimport preincrement
 from cython.operator cimport dereference
@@ -121,7 +120,7 @@ cdef extern from "jsoninter.h":
 
 	cdef object element_to_py_string(simdjson_element & value) except + simdjson_error_handler
 
-	cdef PyObject * string_view_to_python_string(string_view & sv)
+	cdef object string_view_to_python_string(string_view & sv)
 	cdef string get_active_implementation()
 
 	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
@@ -157,7 +156,7 @@ cdef class JSONObject:
 			v = it.value()
 
 			elem = JSONElement.from_element(v)
-			yield <object> string_view_to_python_string(sv), elem.get_value()
+			yield string_view_to_python_string(sv), elem.get_value()
 			preincrement(it)
 
 
