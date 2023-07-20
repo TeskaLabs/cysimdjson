@@ -31,8 +31,8 @@ inline PyObject * element_to_py_string(dom::element & value) {
 }
 
 
-inline std::string get_active_implementation() {
-	return simdjson::active_implementation->description();
+inline std::string obtain_active_implementation() {
+	return simdjson::get_active_implementation()->description();
 }
 
 

@@ -122,7 +122,7 @@ cdef extern from "jsoninter.h":
 	cdef object element_to_py_string(simdjson_element & value) except + simdjson_error_handler
 
 	cdef PyObject * string_view_to_python_string(string_view & sv)
-	cdef string get_active_implementation()
+	cdef string obtain_active_implementation()
 
 	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
 
@@ -462,7 +462,7 @@ cdef class JSONParser:
 
 
 	def active_implementation(JSONParser self):
-		return get_active_implementation()
+		return obtain_active_implementation()
 
 
 cdef public api object cysimdjson_addr_to_element(void * element):
