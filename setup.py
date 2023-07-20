@@ -23,6 +23,7 @@ extensions = [
 			"-Wno-deprecated",
 		# NOTE Windows doesn't know how to handle "-Wno-deprecated"		
 		] if sys.platform != "win32" else ["/std:c++17"],
+		define_macros=[("CYTHON_EXTERN_C", 'extern "C"')],  # https://cython.readthedocs.io/en/latest/src/userguide/external_C_code.html#c-public-declarations
 	)
 ]
 
