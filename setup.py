@@ -22,15 +22,17 @@ extensions = [
 			"-std=c++17",  # for std::string_view class that became standard in C++17
 			"-Wno-deprecated",
 		# NOTE Windows doesn't know how to handle "-Wno-deprecated"		
-		] if sys.platform != "win32" else ["/std:c++17"],
+		] if sys.platform != "win32" else [
+			"/std:c++17",
+		],
 		define_macros=[("CYTHON_EXTERN_C", 'extern "C"')],  # https://cython.readthedocs.io/en/latest/src/userguide/external_C_code.html#c-public-declarations
 	)
 ]
 
 setup(
 	name='cysimdjson',
-	version="21.11",
-	description='Cython-based wrapper for SIMDJSON',
+	version="23.07",
+	description='High-speed JSON parser',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
 	author='TeskaLabs Ltd',
@@ -45,6 +47,9 @@ setup(
 		'Programming Language :: Python :: 3.9',
 		'Programming Language :: Python :: 3.10',
 		'Programming Language :: Python :: 3.11',
+		'Operating System :: Microsoft :: Windows',
+		'Operating System :: POSIX :: Linux',
+		'Operating System :: MacOS :: MacOS X',
 	],
 	packages=[
 		"cysimdjson",
