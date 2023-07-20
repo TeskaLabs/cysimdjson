@@ -97,8 +97,8 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
 		simdjson_parser()
 		simdjson_parser(size_t max_capacity)
 
-		simdjson_element load(string) except + simdjson_error_handler
-		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler
+		simdjson_element load(string) except + simdjson_error_handler nogil
+		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler nogil
 
 
 cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom::element_type":
