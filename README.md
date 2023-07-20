@@ -9,13 +9,11 @@ it may represent a significant bottleneck.
 
 Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://github.com/TkTech/pysimdjson), [libpy_simdjson](https://github.com/gerrymanoim/libpy_simdjson) or [orjson](https://github.com/ijl/orjson), they don't reach the raw speed that is provided by the brilliant [SIMDJSON](https://simdjson.org) project. SIMDJSON is C++ JSON parser based on [SIMD instructions](https://en.wikipedia.org/wiki/SIMD), reportedly the fastest JSON parser on the planet.
 
-
-Tests: 
 [![Python 3.11](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py311.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py311.yaml)
-[![Python 3.10](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml)
+[![Python 3.10](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml)  
 [![Python 3.9](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py39.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py39.yaml)
 [![Python 3.8](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py38.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py38.yaml)
-[![Python 3.7](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py37.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py37.yaml)
+[![Python 3.7](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py37.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py37.yaml)  
 
 ## Usage
 
