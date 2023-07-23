@@ -26,6 +26,9 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 		self.cysimdjsonapi.cysimdjson_element_get.restype = ctypes.c_bool
 		self.cysimdjsonapi.cysimdjson_element_get.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p]
 
+		self.cysimdjsonapi.cysimdjson_minify.restype = ctypes.c_size_t
+		self.cysimdjsonapi.cysimdjson_minify.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t]
+
 
 	def test_capi_01(self):
 		parser = self.cysimdjsonapi.cysimdjson_parser_new()
@@ -153,3 +156,57 @@ class CySIMDJSONCAPITestCases(unittest.TestCase):
 		cython_element = cysimdjson.addr_to_element(element_addr)
 		val = cython_element.at_pointer("/document/key4")
 		self.assertEqual(val, 40)
+
+
+	def test_capi_07(self):
+		'''
+		Export parsed JSON into a string
+		'''
+
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'test.json'), 'r') as fo:
+			json_parsed = parser.parse_string(fo.read())
+
+		# Transition into C API
+		element_addr = json_parsed.get_addr()
+		self.assertNotEqual(element_addr, 0)
+
+		buf_max_size = 16*1024
+		buf = ctypes.create_string_buffer(buf_max_size)
+
+		size = self.cysimdjsonapi.cysimdjson_minify(
+			element_addr,
+			buf,
+			buf_max_size
+		)
+		self.assertNotEqual(size, 0)
+
+		json_string = buf[:size].decode('utf-8')
+		self.assertEqual(json_string, r'''{"document":{"key1":1,"key2":"2","key3":"3","key4":40,"key5":"50"}}''')
+
+
+
+	def test_capi_08(self):
+		'''
+		Try to export parsed JSON into a string but the output buffer is too small
+		'''
+
+		parser = cysimdjson.JSONParser()
+
+		with open(os.path.join(THIS_DIR, 'test.json'), 'r') as fo:
+			json_parsed = parser.parse_string(fo.read())
+
+		# Transition into C API
+		element_addr = json_parsed.get_addr()
+		self.assertNotEqual(element_addr, 0)
+
+		buf_max_size = 3
+		buf = ctypes.create_string_buffer(buf_max_size)
+
+		size = self.cysimdjsonapi.cysimdjson_minify(
+			element_addr,
+			buf,
+			buf_max_size
+		)
+		self.assertEqual(size, 0)

@@ -186,3 +186,16 @@ int cysimdjson_parser_test() {
 	
 	return 0;
 }
+
+
+size_t cysimdjson_minify(void * e, char * buffer, size_t buffer_size) {
+	simdjson::dom::element * element = static_cast<simdjson::dom::element *>(e);
+	std::string json_string = simdjson::minify(*element);
+
+	if (json_string.size() < buffer_size) {
+		std::strcpy(buffer, json_string.c_str());
+		return json_string.size();
+	} else {
+		return 0; // The output JSON doesn't fit
+	}
+}
