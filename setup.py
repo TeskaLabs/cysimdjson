@@ -21,8 +21,7 @@ extensions = [
 		extra_compile_args=[
 			"-std=c++17",  # for std::string_view class that became standard in C++17
 			"-Wno-deprecated",
-		# NOTE Windows doesn't know how to handle "-Wno-deprecated"		
-		] if sys.platform != "win32" else [
+		] if sys.platform != "win32" else [  # NOTE Windows doesn't know how to handle "-Wno-deprecated"
 			"/std:c++17",
 		],
 		define_macros=[("CYTHON_EXTERN_C", 'extern "C"')],  # https://cython.readthedocs.io/en/latest/src/userguide/external_C_code.html#c-public-declarations
@@ -31,7 +30,7 @@ extensions = [
 
 setup(
 	name='cysimdjson',
-	version="23.07",
+	version="23.08",
 	description='High-speed JSON parser',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
