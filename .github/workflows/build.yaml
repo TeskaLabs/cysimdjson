@@ -25,6 +25,7 @@ jobs:
           # configure cibuildwheel to build native archs ('auto'), and some
           # emulated ones
           CIBW_ARCHS_LINUX: auto aarch64 ppc64le s390x
+          CIBW_SKIP: cp36-win32 cp37-win32 cp38-win32 cp39-win32 cp310-win32 cp311-win32 cp312-win32
 
       - uses: actions/upload-artifact@v3
         with:
