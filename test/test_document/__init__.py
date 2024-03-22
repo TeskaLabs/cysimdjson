@@ -125,3 +125,11 @@ class JSONDocumentTestCases(unittest.TestCase):
 		self.assertEqual(json_parsed['foo'], 'bar')
 
 
+
+	def test_jsonpointer_01(self):
+		parser = cysimdjson.JSONParser()
+		with open(os.path.join(THIS_DIR, 'document.json'), 'rb') as fo:
+			json_parsed = parser.parse(fo.read())
+
+			with self.assertRaises(ValueError):
+				json_parsed.at_pointer("/document/key4/sub")
