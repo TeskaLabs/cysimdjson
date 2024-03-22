@@ -42,11 +42,13 @@ _Note: `parser` object can be reused for maximum performance._
 parser = cysimdjson.JSONParser()
 json_parsed = parser.loads(json_bytes)
 
-# Access using JSON Pointer
+# Access in a Python way
 print(json_parsed.json_parsed['foo'])
 ```
 
 The `json_parsed` is a read-only dictionary-like object, that provides an access to JSON data.
+
+**WARNING:** This method of the access will be deprecated in the future, likely in favour of JSON Pointer.
 
 
 ## Trade-offs
