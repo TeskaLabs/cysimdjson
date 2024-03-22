@@ -125,7 +125,7 @@ cdef extern from "jsoninter.h":
 
 	cdef const char * PyUnicode_AsUTF8AndSize(object, Py_ssize_t *)
 
-	cdef simdjson_element extract_element(void *)
+	cdef simdjson_element extract_element(void *) except + simdjson_error_handler
 	cdef size_t element_addrof(simdjson_element & value)
 
 
@@ -474,9 +474,7 @@ cdef public api object cysimdjson_addr_to_element(void * element):
 
 
 def addr_to_element(element_addr: int):
-	cdef char * e = NULL
-	e += <size_t>element_addr
-	cdef simdjson_element v = extract_element(e)
+	cdef simdjson_element v = extract_element(<void *><size_t>element_addr)
 	return JSONElement.from_element(v)
 
 
