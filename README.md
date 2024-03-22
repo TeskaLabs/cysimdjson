@@ -55,7 +55,8 @@ The speed of `cysimdjson` is based on these assumptions:
 
 1) The output of the parser is read-only, you cannot modify it
 2) The output of the parser is not Python dictionary, but lazily evaluated dictionary-like object
-3) If you convert the parser output into a Python dictionary, you will lose the speed
+3) The parser output is valid only until `JSONParser` object is still alive (not destroyed), otherwise you will get ugly errors
+4) If you convert the parser output into a Python dictionary, you will lose the speed
 
 If your design is not aligned with these assumptions, `cysimdjson` is not a good choice.
 
