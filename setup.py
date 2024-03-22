@@ -30,7 +30,7 @@ extensions = [
 
 setup(
 	name='cysimdjson',
-	version="23.08",
+	version="24.12",
 	description='High-speed JSON parser',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
@@ -46,6 +46,7 @@ setup(
 		'Programming Language :: Python :: 3.9',
 		'Programming Language :: Python :: 3.10',
 		'Programming Language :: Python :: 3.11',
+		'Programming Language :: Python :: 3.12',
 		'Operating System :: Microsoft :: Windows',
 		'Operating System :: POSIX :: Linux',
 		'Operating System :: MacOS :: MacOS X',
