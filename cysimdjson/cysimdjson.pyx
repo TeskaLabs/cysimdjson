@@ -1,116 +1,9 @@
 # cython: language_level=3
 
-from libc.stdint cimport int64_t, uint64_t
-from libcpp cimport bool
-from libcpp.string cimport string
-
 from cpython.bytes cimport PyBytes_AsStringAndSize
 
 from cython.operator cimport preincrement
 from cython.operator cimport dereference
-
-
-cdef extern from "<string_view>" namespace "std":
-	cppclass string_view:
-		pass
-
-
-cdef extern from "pysimdjson/errors.h":
-	cdef void simdjson_error_handler()
-
-
-cdef extern from "simdjson/simdjson.h" namespace "simdjson":
-
-	cdef size_t SIMDJSON_MAXSIZE_BYTES
-	cdef size_t SIMDJSON_PADDING
-
-	cdef enum:
-		SIMDJSON_VERSION_MAJOR
-		SIMDJSON_VERSION_MINOR
-		SIMDJSON_VERSION_REVISION
-
-
-cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
-
-	cdef cppclass simdjson_object "simdjson::dom::object":
-
-		cppclass iterator:
-			iterator()
-
-			simdjson_object operator*()
-			iterator operator++()
-			bint operator==(iterator)
-			bint operator!=(iterator)
-
-			string_view key()
-			simdjson_element value()
-
-		simdjson_object()
-
-		iterator begin()
-		iterator end()
-
-		size_t size()
-
-		simdjson_element at_pointer(const char*) except +simdjson_error_handler
-		simdjson_element operator[](const char*) except +simdjson_error_handler
-
-
-	cdef cppclass simdjson_array "simdjson::dom::array":
-
-		cppclass iterator:
-			iterator()
-
-			operator++()
-			bint operator!=(iterator)
-			simdjson_element operator*()
-
-		simdjson_array()
-
-		iterator begin()
-		iterator end()
-
-		size_t size()
-
-		simdjson_element at(int) except +simdjson_error_handler
-		simdjson_element at_pointer(const char*) except +simdjson_error_handler
-
-
-	cdef cppclass simdjson_element "simdjson::dom::element":
-
-		simdjson_element()
-
-		simdjson_element_type type() except +simdjson_error_handler
-
-		bool get_bool() except +simdjson_error_handler
-		int64_t get_int64() except +simdjson_error_handler
-		uint64_t get_uint64() except +simdjson_error_handler
-		double get_double() except +simdjson_error_handler
-		simdjson_array get_array() except +simdjson_error_handler
-		simdjson_object get_object() except +simdjson_error_handler
-
-		simdjson_element at_pointer(const char*) except +simdjson_error_handler
-
-
-	cdef cppclass simdjson_parser "simdjson::dom::parser":
-
-		simdjson_parser()
-		simdjson_parser(size_t max_capacity)
-
-		simdjson_element load(string) except + simdjson_error_handler nogil
-		simdjson_element parse(const char * buf, size_t len, bool realloc_if_needed) except + simdjson_error_handler nogil
-
-
-cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom::element_type":
-	cdef enum simdjson_element_type "simdjson::dom::element_type":
-		OBJECT,
-		ARRAY,
-		STRING,
-		INT64,
-		UINT64,
-		DOUBLE,
-		BOOL,
-		NULL_VALUE
 
 
 cdef extern from "jsoninter.h":
@@ -130,11 +23,6 @@ cdef extern from "jsoninter.h":
 
 
 cdef class JSONObject:
-
-	cdef:
-		simdjson_element Element
-		simdjson_object Object
-
 
 	def __contains__(JSONObject self, key):
 		key_raw = key.encode('utf-8')
@@ -177,7 +65,7 @@ cdef class JSONObject:
 		if not found:
 			return default
 		return JSONElement.from_element(v).get_value()
-	
+
 
 	def __len__(JSONObject self):
 		return self.Object.size()
@@ -193,20 +81,20 @@ cdef class JSONObject:
 			preincrement(it)
 
 
-	def at_pointer(JSONObject self, key):
+	cpdef object at_pointer(JSONObject self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Object.at_pointer(key_raw)
 		return JSONElement.from_element(v).get_value()
 
 
-	def get_value(JSONElement self):
+	cpdef object get_value(JSONObject self):
 		'''
 		Get the python value
 		'''
 		return self
 
 
-	def export(self):
+	cpdef object export(JSONObject self):
 		'''
 		Export the JSON object to a Python dictionary.
 		WARNING: This is expensive operation.
@@ -214,16 +102,11 @@ cdef class JSONObject:
 		return _export_object(self.Object)
 
 
-	def get_addr(JSONElement self):
+	def get_addr(JSONObject self):
 		return element_addrof(self.Element)
 
 
 cdef class JSONArray:
-
-	cdef:
-		simdjson_element Element
-		simdjson_array Array
-
 
 	def __contains__(JSONArray self, item):
 		# This is a full scan
@@ -256,20 +139,20 @@ cdef class JSONArray:
 			preincrement(it)
 
 
-	def at_pointer(JSONArray self, key):
+	cpdef object at_pointer(JSONArray self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Array.at_pointer(key_raw)
 		return JSONElement.from_element(v).get_value()
 
 
-	def get_value(JSONElement self):
+	cpdef object get_value(JSONArray self):
 		'''
 		Get the python value
 		'''
 		return self
 
 
-	def export(self):
+	cpdef object export(JSONArray self):
 		'''
 		Export the JSON array to a Python list.
 		WARNING: This is expensive operation.
@@ -277,17 +160,14 @@ cdef class JSONArray:
 		return _export_array(self.Array)
 
 
-	def get_addr(JSONElement self):
+	def get_addr(JSONArray self):
 		return element_addrof(self.Element)
 
 
 cdef class JSONElement:
 
-	cdef:
-		simdjson_element Element
-
 	@staticmethod
-	cdef inline from_element(simdjson_element element):
+	cdef from_element(simdjson_element element):
 		'''
 		This is the correct factory method
 		'''
@@ -312,17 +192,17 @@ cdef class JSONElement:
 
 
 
-	def at_pointer(JSONElement self, key: str):
+	cpdef object at_pointer(JSONElement self, key):
 		key_raw = key.encode('utf-8')
 		cdef simdjson_element v = self.Element.at_pointer(key_raw)
 		return JSONElement.from_element(v)
 
 
-	def get_value(JSONElement self):
+	cpdef object get_value(JSONElement self):
 		return _get_element(self.Element)
 
 
-	def export(JSONElement self):
+	cpdef object export(JSONElement self):
 		return _export_element(self.Element)
 
 
@@ -394,10 +274,6 @@ cdef inline object _get_element(simdjson_element v):
 
 cdef class JSONParser:
 
-	cdef:
-		simdjson_parser Parser
-
-
 	def __cinit__(JSONParser self, max_capacity=None):
 		if max_capacity is not None:
 			self.Parser = simdjson_parser.simdjson_parser(int(max_capacity))
@@ -405,7 +281,7 @@ cdef class JSONParser:
 			self.Parser = simdjson_parser.simdjson_parser()
 
 
-	def parse(JSONParser self, event: bytes):
+	cpdef object parse(JSONParser self, bytes event):
 		cdef Py_ssize_t pysize
 		cdef char * data_ptr
 		cdef int rc = PyBytes_AsStringAndSize(event, &data_ptr, &pysize)
@@ -416,7 +292,7 @@ cdef class JSONParser:
 		return JSONElement.from_element(element)
 
 
-	def parse_in_place(JSONParser self, event: bytes):
+	cpdef object parse_in_place(JSONParser self, bytes event):
 		'''
 		Skip the reallocation of the input event buffer.
 		This method is little bit faster than parse() but you have to ensure proper padding of the event.
@@ -431,7 +307,7 @@ cdef class JSONParser:
 		return JSONElement.from_element(element)
 
 
-	def parse_string(JSONParser self, event: str):
+	cpdef object parse_string(JSONParser self, str event):
 
 		cdef Py_ssize_t pysize
 		cdef const char * data_ptr = PyUnicode_AsUTF8AndSize(event, &pysize)
