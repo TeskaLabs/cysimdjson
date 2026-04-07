@@ -37,7 +37,7 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
 			iterator()
 
 			key_value_pair operator*()
-			iterator operator++()
+			iterator& operator++()
 			bint operator==(iterator)
 			bint operator!=(iterator)
 
@@ -60,7 +60,7 @@ cdef extern from "simdjson/simdjson.h" namespace "simdjson::dom":
 		cppclass iterator:
 			iterator()
 
-			iterator operator++()
+			iterator& operator++()
 			bint operator!=(iterator)
 			simdjson_element operator*()
 
