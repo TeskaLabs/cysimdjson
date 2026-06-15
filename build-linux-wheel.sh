@@ -1,12 +1,6 @@
 cd /cysimdjson
 
-rm -rf build cysimdjson.egg-info
-/opt/python/cp36-cp36m/bin/pip3 install Cython wheel
-/opt/python/cp36-cp36m/bin/python3 setup.py bdist_wheel
 
-rm -rf build cysimdjson.egg-info
-/opt/python/cp37-cp37m/bin/pip3 install Cython wheel
-/opt/python/cp37-cp37m/bin/python3 setup.py bdist_wheel
 
 rm -rf build cysimdjson.egg-info
 /opt/python/cp38-cp38/bin/pip3 install Cython wheel
@@ -27,6 +21,14 @@ rm -rf build cysimdjson.egg-info
 rm -rf build cysimdjson.egg-info
 /opt/python/cp312-cp312/bin/pip3 install Cython wheel
 /opt/python/cp312-cp312/bin/python3 setup.py bdist_wheel
+
+rm -rf build cysimdjson.egg-info
+/opt/python/cp313-cp313/bin/pip3 install setuptools Cython wheel
+/opt/python/cp313-cp313/bin/python3 setup.py bdist_wheel
+
+rm -rf build cysimdjson.egg-info
+/opt/python/cp314-cp314/bin/pip3 install setuptools Cython wheel
+/opt/python/cp314-cp314/bin/python3 setup.py bdist_wheel
 
 cd /cysimdjson/dist
 find . -name "cysimdjson-*-linux_x86_64.whl" | xargs -n 1 auditwheel repair -w /cysimdjson/dist
