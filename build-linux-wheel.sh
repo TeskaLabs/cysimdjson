@@ -1,12 +1,6 @@
 cd /cysimdjson
 
-rm -rf build cysimdjson.egg-info
-/opt/python/cp36-cp36m/bin/pip3 install Cython wheel
-/opt/python/cp36-cp36m/bin/python3 setup.py bdist_wheel
 
-rm -rf build cysimdjson.egg-info
-/opt/python/cp37-cp37m/bin/pip3 install Cython wheel
-/opt/python/cp37-cp37m/bin/python3 setup.py bdist_wheel
 
 rm -rf build cysimdjson.egg-info
 /opt/python/cp38-cp38/bin/pip3 install Cython wheel
