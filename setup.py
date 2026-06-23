@@ -66,6 +66,9 @@ setup(
 	],
 	package_data={
 		"cysimdjson": [
+			"py.typed",
+			"cysimdjson.pxd",
+			"cysimdjson.pyi",
 			"cysimdjson.pyx",
 			"cysimdjson.h",
 			"cysimdjsonc.h",
