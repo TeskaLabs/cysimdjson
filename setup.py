@@ -1,8 +1,15 @@
+import subprocess
+import sys
+
+try:
+	import setuptools  # noqa: F401
+except ImportError:
+	subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+
 from setuptools import setup, Extension
 from os import path
 
 from Cython.Build import cythonize
-import sys 
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -30,7 +37,7 @@ extensions = [
 
 setup(
 	name='cysimdjson',
-	version="24.12",
+	version="26.27",
 	description='High-speed JSON parser',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
@@ -40,7 +47,6 @@ setup(
 	classifiers=[
 		'Development Status :: 5 - Production/Stable',
 		'License :: OSI Approved :: Apache Software License',
-		'Programming Language :: Python :: 3.8',
 		'Programming Language :: Python :: 3.9',
 		'Programming Language :: Python :: 3.10',
 		'Programming Language :: Python :: 3.11',

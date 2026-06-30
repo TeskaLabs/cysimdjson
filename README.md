@@ -15,7 +15,6 @@ Whilst there are other fast Python JSON parsers, such as [pysimdjson](https://gi
 [![Python 3.11](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py311.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py311.yaml)
 [![Python 3.10](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py310.yaml)  
 [![Python 3.9](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py39.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py39.yaml)
-[![Python 3.8](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py38.yaml/badge.svg)](https://github.com/TeskaLabs/cysimdjson/actions/workflows/py38.yaml)
 
 ## Usage
 

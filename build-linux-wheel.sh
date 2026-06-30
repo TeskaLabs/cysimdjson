@@ -1,10 +1,8 @@
+#!/bin/bash
+
+set -e
+
 cd /cysimdjson
-
-
-
-rm -rf build cysimdjson.egg-info
-/opt/python/cp38-cp38/bin/pip3 install Cython wheel
-/opt/python/cp38-cp38/bin/python3 setup.py bdist_wheel
 
 rm -rf build cysimdjson.egg-info
 /opt/python/cp39-cp39/bin/pip3 install Cython wheel
@@ -28,6 +26,7 @@ rm -rf build cysimdjson.egg-info
 
 rm -rf build cysimdjson.egg-info
 /opt/python/cp314-cp314/bin/pip3 install setuptools Cython wheel
+/opt/python/cp314-cp314/bin/python3 setup.py sdist
 /opt/python/cp314-cp314/bin/python3 setup.py bdist_wheel
 
 cd /cysimdjson/dist
